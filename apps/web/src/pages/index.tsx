@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Donut from "../components/Donut";
 
 export default function Home() {
   return (
@@ -8,7 +9,10 @@ export default function Home() {
       </Head>
 
       <main className="mx-auto w-auto px-4 pt-16 pb-8 sm:pt-24 lg:px-8">
-        <h1 className="mx-auto text-center text-6xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl xl:text-8xl">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <Donut />
+        </div>
+        <h1 className="mt-20 mx-auto text-center text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-4xl">
           OS JANOT
         </h1>
       </main>
