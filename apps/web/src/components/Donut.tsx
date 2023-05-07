@@ -64,6 +64,7 @@ const Donut = ({
   let acceleration = 0;
   let animatestep = 0;
   let toend = false;
+  let isListen = false;
 
   const canvasRef = useRef(null);
 
@@ -143,6 +144,7 @@ const Donut = ({
         0,
         Math.min(240, toend ? animatestep + 1 : animatestep - 4)
       );
+      if (isListen) animatestep = 80
       acceleration = easing(animatestep, 0, 1, 240);
 
       if (acceleration > 0.35) {
@@ -176,9 +178,11 @@ const Donut = ({
   const handleMouseDown = () => {
     handleListen();
     toend = true;
+    isListen = true;
   };
 
   const handleMouseUp = async () => {
+    isListen = false;
     await handleProcess();
     toend = false;
   };
