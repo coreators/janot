@@ -47,7 +47,13 @@ function easing(t: number, b: number, c: number, d: number) {
   return (c / 2) * ((t -= 2) * t * t + 2) + b;
 }
 
-const Donut = () => {
+const Donut = ({
+  handleListen,
+  handleProcess,
+}: {
+  handleListen?: () => void,
+  handleProcess?: () => void,
+}) => {
   const canvassize = 400;
 
   const wireframe = false;
@@ -133,7 +139,6 @@ const Donut = () => {
 
     const render = () => {
       let progress: number;
-
       animatestep = Math.max(
         0,
         Math.min(240, toend ? animatestep + 1 : animatestep - 4)
@@ -160,19 +165,21 @@ const Donut = () => {
     };
     animate();
 
-    document.body.addEventListener("mousedown", start, false);
-    document.body.addEventListener("touchstart", start, false);
-    document.body.addEventListener("mouseup", back, false);
-    document.body.addEventListener("touchend", back, false);
+    document.body.addEventListener("mousedown", handleMouseDown, false);
+    document.body.addEventListener("touchstart", handleMouseDown, false);
+    document.body.addEventListener("mouseup", handleMouseUp, false);
+    document.body.addEventListener("touchend", handleMouseUp, false);
 
     return () => canvasRef.current?.removeChild(renderer.domElement);
   }, []);
 
-  const start = () => {
+  const handleMouseDown = () => {
+    handleListen();
     toend = true;
   };
 
-  const back = () => {
+  const handleMouseUp = async () => {
+    await handleProcess();
     toend = false;
   };
 
