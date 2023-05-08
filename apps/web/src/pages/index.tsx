@@ -1,43 +1,67 @@
 import Head from "next/head";
+import { useEffect, useRef } from "react";
 import CurveAnimation from "../components/CurveAnimation";
-import { useRef } from "react";
+
+import { useAudioRecorder } from 'react-audio-voice-recorder';
 
 export default function Home() {
+  const {
+    startRecording,
+    stopRecording,
+    togglePauseResume,
+    recordingBlob,
+    isRecording,
+    isPaused,
+    recordingTime,
+  } = useAudioRecorder();
 
-  const childRef = useRef(
-    {
-      start: () => {},
-      end: () => {}
-    }
-  );
+  const childRef = useRef({
+    start: () => {},
+    end: () => {},
+  });
 
-  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const listen = () => {
     // stt
     if (childRef.current) {
+      console.log("start")
       childRef.current.start();
     }
 
+    startRecording();
+
     // start listen animation (breathing)
-  }
+  };
 
   const process = async () => {
     // start processing animation (fast spin)
     if (childRef.current) {
       childRef.current.end();
+      console.log("end")
     }
+
+    stopRecording();
     // call chain or something
 
     // await processing
     // Wait 3 seconds
     await delay(3000);
-    
 
     // start ending animation (appearing O)
 
     // TTS
-  }
+  };
+
+  useEffect(() => {
+    if (!recordingBlob) return;
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(recordingBlob);
+    link.download = `${+new Date()}.wav`;
+    link.click();
+    // recordingBlob will be present at this point after 'stopRecording' has been called
+  }, [recordingBlob])
 
   return (
     <div
