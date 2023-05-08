@@ -10,8 +10,22 @@ class CustomSinCurve extends THREE.Curve<THREE.Vector> {
     this.scale = scale;
   }
 
+//   var x = length*Math.sin(pi2*percent),
+//   y = radius*Math.cos(pi2*3*percent),
+//   z, t;
+
+// t = percent%0.25/0.25;
+// t = percent%0.25-(2*(1-t)*t* -0.0185 +t*t*0.25);
+// if (Math.floor(percent/0.25) == 0 || Math.floor(percent/0.25) == 2) {
+//   t *= -1;
+// }
+// z = radius*Math.sin(pi2*2* (percent-t));
+
+
   getPoint(t: number, optionalTarget = new THREE.Vector3()) {
     const pi2 = Math.PI * 2;
+    // const tx = t * 3 - 1.5;
+    // const ty = Math.sin(2 * Math.PI * t) / 4;
     const tx = Math.sin(pi2 * t);
     const ty = Math.cos(pi2 * 3 * t) / 5;
 
@@ -33,7 +47,7 @@ function easing(t: number, b: number, c: number, d: number) {
   return (c / 2) * ((t -= 2) * t * t + 2) + b;
 }
 
-const CurveAnimation = ({
+const Donut = ({
   handleListen,
   handleProcess,
 }: {
@@ -175,4 +189,4 @@ const CurveAnimation = ({
 
   return <div ref={canvasRef} />;
 };
-export default CurveAnimation;
+export default Donut;
