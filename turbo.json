@@ -4,7 +4,18 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ]
+    },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "env": [
+      ],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {},
     "check-types": {},
