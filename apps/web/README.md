@@ -1,3 +1,11 @@
+## Useful commands
+
+```
+# Load all documents
+$ curl -X POST http://127.0.0.1:3000/api/actions/load
+```
+
+
 ## Getting Started
 
 First, run the development server:

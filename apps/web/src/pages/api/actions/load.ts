@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { loadAndSearch } from "../../../lib/services/document-service";
+import { loadDocuments } from "../../../lib/services/document-service";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   switch (req.method) {
-    case "GET":
-      handleGet();
+    case "POST":
+      handlePost();
       break;
 
     default:
@@ -17,9 +17,8 @@ export default async function handler(
       break;
   }
 
-  async function handleGet() {
-    const searchResult = await loadAndSearch();
-
-    res.status(200).json(searchResult);
+  async function handlePost() {
+    await loadDocuments();
+    res.status(200).json({ success: true });
   }
 }
