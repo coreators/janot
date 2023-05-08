@@ -167,5 +167,6 @@ const CurveAnimation = forwardRef((props, ref) => {
 
   return <div ref={canvasRef} />;
 });
+CurveAnimation.displayName = "Curve";
 
 export default CurveAnimation;
