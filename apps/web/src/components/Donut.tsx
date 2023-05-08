@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
-
 
 class CustomSinCurve extends THREE.Curve<THREE.Vector> {
   private scale: number;
@@ -30,7 +29,7 @@ class CustomSinCurve extends THREE.Curve<THREE.Vector> {
     const ty = Math.cos(pi2 * 3 * t) / 5;
 
     let dz = 0;
-    const tt = t % 0.25 / 0.25;
+    const tt = (t % 0.25) / 0.25;
     dz = (t % 0.25) - (2 * (1 - tt) * tt * -0.0185 + tt * tt * 0.25);
     if (Math.floor(t / 0.25) == 0 || Math.floor(t / 0.25) == 2) {
       dz *= -1;
@@ -47,13 +46,7 @@ function easing(t: number, b: number, c: number, d: number) {
   return (c / 2) * ((t -= 2) * t * t + 2) + b;
 }
 
-const Donut = ({
-  handleListen,
-  handleProcess,
-}: {
-  handleListen?: () => void,
-  handleProcess?: () => void,
-}) => {
+const CurveAnimation = forwardRef((props, ref) => {
   const canvassize = 400;
 
   const wireframe = false;
@@ -67,6 +60,11 @@ const Donut = ({
   let isListen = false;
 
   const canvasRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    start,
+    end,
+  }));
 
   useEffect(() => {
     const renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -144,7 +142,7 @@ const Donut = ({
         0,
         Math.min(240, toend ? animatestep + 1 : animatestep - 4)
       );
-      if (isListen) animatestep = 80
+      if (isListen) animatestep = 80;
       acceleration = easing(animatestep, 0, 1, 240);
 
       if (acceleration > 0.35) {
@@ -167,26 +165,20 @@ const Donut = ({
     };
     animate();
 
-    document.body.addEventListener("mousedown", handleMouseDown, false);
-    document.body.addEventListener("touchstart", handleMouseDown, false);
-    document.body.addEventListener("mouseup", handleMouseUp, false);
-    document.body.addEventListener("touchend", handleMouseUp, false);
-
     return () => canvasRef.current?.removeChild(renderer.domElement);
   }, []);
 
-  const handleMouseDown = () => {
-    handleListen();
+  const start = () => {
     toend = true;
     isListen = true;
   };
 
-  const handleMouseUp = async () => {
+  const end = async () => {
     isListen = false;
-    await handleProcess();
     toend = false;
   };
 
   return <div ref={canvasRef} />;
-};
-export default Donut;
+});
+
+export default CurveAnimation;
