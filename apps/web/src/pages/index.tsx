@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Donut from "../components/Donut";
+import CurveAnimation from "../components/CurveAnimation";
 
 export default function Home() {
 
@@ -35,7 +35,7 @@ export default function Home() {
 
       <main className="mx-auto w-auto px-4 pt-16 pb-8 sm:pt-24 lg:px-8">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0">
-          <Donut handleListen={listen} handleProcess={process}/>
+          <CurveAnimation handleListen={listen} handleProcess={process}/>
         </div>
         <h1 className="mt-24 mx-auto text-center text-2xl font-thin tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-4xl">
           OS-J
