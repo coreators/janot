@@ -9,13 +9,14 @@ from langchain.vectorstores.faiss import FAISS
 
 def ingest_docs():
     """Get documents from web pages."""
-    loader = ReadTheDocsLoader("langchain.readthedocs.io/en/latest/")
+    loader = ReadTheDocsLoader("python.langchain.com/en/latest/")
     raw_documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
     )
     documents = text_splitter.split_documents(raw_documents)
+    print(documents)
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.from_documents(documents, embeddings)
 

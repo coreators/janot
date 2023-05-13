@@ -135,3 +135,6 @@ dmypy.json
 .chroma
 
 .envrc
+
+python.langchain.com/
+vectorstore.pkl
