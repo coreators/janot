@@ -9,4 +9,4 @@
 ### Commands
 
 `peotry install` : install packages
-`uvicorn main:app` : start server
+`uvicorn main:app --reload` : start server
