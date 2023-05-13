@@ -8,12 +8,18 @@
 
 ### Commands
 
+`poetry shell` : run poetry virtual env
 `poetry install` : install packages
 `uvicorn main:app --reload` : start server
 
 
 ### Additional Commands
 `poetry add <package-name>`
+
+### Env variable
+```
+brew install direnv
+```
 
 
 ### Poetry venv VScode setting
