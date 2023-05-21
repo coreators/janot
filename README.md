@@ -12,6 +12,11 @@ Install peotry(https://python-poetry.org/docs/)
 Install pnpm
 Install turbo
 
+```
+$ npm install -g pnpm
+$ npm install turbo --global
+```
+
 ## How to run
 Install packages
 ```
@@ -20,7 +25,7 @@ $ pnpm i
 
 Run web
 ```
-turbo dev --filter web
+$ turbo dev --filter web
 ```
 
 ## Structure
