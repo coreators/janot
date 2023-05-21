@@ -22,9 +22,9 @@ vectorstore: Optional[VectorStore] = None
 @app.on_event("startup")
 async def startup_event():
     logging.info("loading vectorstore")
-    if not Path("janot_vectorstore.pkl").exists():
+    if not Path("vectorstore.pkl").exists():
         raise ValueError("vectorstore.pkl does not exist, please run ingest.py first")
-    with open("janot_vectorstore.pkl", "rb") as f:
+    with open("vectorstore.pkl", "rb") as f:
         global vectorstore
         vectorstore = pickle.load(f)
 
