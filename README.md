@@ -12,6 +12,17 @@ Install peotry(https://python-poetry.org/docs/)
 Install pnpm
 Install turbo
 
+## How to run
+Install packages
+```
+$ pnpm i
+```
+
+Run web
+```
+turbo dev --filter web
+```
+
 ## Structure
 * apps/ : various applications
 * packages/ : typescript packages
