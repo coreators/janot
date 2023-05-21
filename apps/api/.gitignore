@@ -137,4 +137,6 @@ dmypy.json
 .envrc
 
 python.langchain.com/
-vectorstore.pkl
+*vectorstore.pkl
+
+example_data
