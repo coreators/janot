@@ -4,7 +4,7 @@ st.markdown("# Trading Journal")
 st.sidebar.markdown("# Trading Journal")
 
 
-total, korea, usa, crypto= st.tabs(['Total', 'Korea', 'USA','Crypto'])
+total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA',"Dollar"])
 st.sidebar.success("Trading Journal 🎈")
 st.sidebar.info("여기는 매매일지 정리 페이지입니다.")
 st.sidebar.title("Trading Journal 🎈")
@@ -41,6 +41,3 @@ with korea:
 
 with usa:
     st.title("USA Accounts")
-
-with crypto:
-    st.title("Crypto Accounts")

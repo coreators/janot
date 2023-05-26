@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="My Portfolio",
     page_icon="👋",
 )
-total, korea, usa, crypto= st.tabs(['Total', 'Korea', 'USA','Crypto'])
+total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA','Dollar'])
 
 with total:
     st.title("All Accounts")
@@ -15,15 +15,22 @@ with korea:
 
 with usa:
     st.title("USA Accounts")
+    # 샀을때의 환율
+    # 기존에 가지고 있던 달러로 했으면 그대로 써주기
 
-with crypto:
-    st.title("Crypto Accounts")
 
 
 st.markdown("# Main page 🎈")
 st.sidebar.success("Main page 🎈")
 st.sidebar.info("여기는 메인 페이지입니다.포트폴리오를 여기다가 구현할 예정입니다.")
 st.sidebar.title("Main page 🎈")
+st.sidebar.button("포트폴리오 그래프")
+st.sidebar.checkbox("현재 포트폴리오의 종목별 비중")
+st.sidebar.checkbox("현재 포트폴리오의 국가별 비중")
+st.sidebar.checkbox("현재 포트폴리오의 자산별 비중")
+st.sidebar.button("포트폴리오 수익률")
+
+
 
 st.sidebar.markdown(
     """
@@ -45,18 +52,23 @@ st.sidebar.markdown(
 )
 st.markdown(
     """
-    Streamlit is an open-source app framework built specifically for
-    Machine Learning and Data Science projects.
-    **👈 Select a demo from the sidebar** to see some examples
-    of what Streamlit can do!
-    ### Want to learn more?
-    - Check out [streamlit.io](https://streamlit.io)
-    - Jump into our [documentation](https://docs.streamlit.io)
-    - Ask a question in our [community
-        forums](https://discuss.streamlit.io)
-    ### See more complex demos
-    - Use a neural net to [analyze the Udacity Self-driving Car Image
-        Dataset](https://github.com/streamlit/demo-self-driving)
-    - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-"""
+    포트폴리오 그래프 
+    
+    - 현재 포트폴리오의 종목별 비중 (etc는 너무 작을때 그냥 무시)
+    - 현재 포트폴리오의 분야별 비중
+    - 현재 포트폴리오의 국가별 비중
+    - 현재 포트폴리오의 자산별 비중
+    
+    
+    종목명	매매 시작일	보유수량	평균단가	총 투자금	현재주가	평가 수익률	평가 손익	평가금액	"매매 비용
+    
+    (수수료+제세금)"	실현 수익률	실현손익	종목 설명	비중	포트	52주 최고점 ($)	고점대비 하락률
+	
+	자산비중							
+    현금	100%		평가 손익합			달러당 환율	
+    주식	0%		
+    채권	0%
+    한국주식
+    미국주식
+    """
 )
