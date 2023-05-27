@@ -5,9 +5,9 @@ st.sidebar.markdown("# Trading Journal")
 
 
 total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA',"Dollar"])
-st.sidebar.success("Trading Journal 🎈")
+st.sidebar.success("Trading Journal 📝")
 st.sidebar.info("여기는 매매일지 정리 페이지입니다.")
-st.sidebar.title("Trading Journal 🎈")
+st.sidebar.title("Trading Journal 📝")
 st.sidebar.markdown(
     """
     아래는 본 페이지의 요구사항 정리입니다.
@@ -22,7 +22,7 @@ st.sidebar.markdown(
     - 세금을 기록할 수 있어야함. (왠만하면 알아서 되게)
     - 증권사별로 대표 세금 설정 가능해야 ( 수동으로도 바꿀 수 있어야함.)
     - 매수 매도 차액 반영 방식은 주로 사용하는 방식으로 하도록하기.
-    
+    - 검색기능
     
     ## 달러관련
     - 달러를 얼마에 샀는지?

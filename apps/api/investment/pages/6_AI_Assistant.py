@@ -1,11 +1,11 @@
 import streamlit as st
 
-st.markdown("# Page 2")
-st.sidebar.markdown("# Page 2")
+st.markdown("# AI Assistant page 🤖")
+st.sidebar.markdown("# AI Assistant page 🤖")
 
-st.sidebar.success("AI Assistant 🎈")
+st.sidebar.success("AI Assistant 🤖")
 st.sidebar.info("여기는 AI 기능을 넣을 페이지입니다.")
-st.sidebar.title("AI Assistant page 🎈")
+st.sidebar.title("AI Assistant page 🤖")
 st.sidebar.markdown(
     """
     다음은 본 페이지의 요구사항입니다.    
