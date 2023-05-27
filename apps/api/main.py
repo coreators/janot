@@ -1,10 +1,16 @@
 """Main entrypoint for the app."""
 import logging
+import aiofiles
+import os
 import pickle
-from pathlib import Path
-from typing import Optional
+import openai
 
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from pathlib import Path
+from typing import Annotated, Optional
+
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, File, Form, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi.templating import Jinja2Templates
 from langchain.vectorstores import VectorStore
 
@@ -15,6 +21,20 @@ from schemas import ChatResponse
 from domain.query import query_router
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory="templates")
 vectorstore: Optional[VectorStore] = None
 
@@ -36,6 +56,19 @@ app.include_router(query_router.router)
 async def get(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.post("/transcriptions")
+async def transcriptions(audioData: UploadFile,model: Annotated[str, Form()]):
+    UPLOAD_DIRECTORY = "./whisper/"
+    audio_file_path = os.path.join(UPLOAD_DIRECTORY, audioData.filename)
+
+    async with aiofiles.open(audio_file_path, 'wb+') as out_file:
+        content = await audioData.read()  # async read
+        await out_file.write(content)  # async write
+
+    audio_file= open(audio_file_path, "rb")
+
+    transcription = openai.Audio.transcribe("whisper-1", audio_file)
+    return transcription
 
 @app.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket):
