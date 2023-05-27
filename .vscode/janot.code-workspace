@@ -13,5 +13,10 @@
       "path": "../apps/web"
     }
   ],
-  "settings": {}
+  "settings": {
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.python"
+    },
+    "python.formatting.provider": "none"
+  }
 }
