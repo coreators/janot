@@ -1,0 +1,7 @@
+{
+    "name": "api",
+    "private": true,
+    "scripts": {
+      "dev": "direnv allow . && eval $(direnv export bash) && poetry run make start"
+    }
+  }
