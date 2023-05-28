@@ -40,16 +40,19 @@ const CurveAnimation = forwardRef((props, ref) => {
 
   const length = 40;
   const rotatevalue = 0.035;
-  let acceleration = 0;
-  let animatestep = 0;
-  let toend = false;
-  let isListen = false;
+  let acceleration = useRef(0);
+  let animatestep = useRef(0);
+  let toEndRef = useRef(false);
+  let isListenRef = useRef(false);
+  let isProcessRef = useRef(false);
 
   const canvasRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    start,
-    end,
+    listen: listen,
+    process: process,
+    finish: finish,
+    end: end,
   }));
 
   useEffect(() => {
@@ -95,7 +98,7 @@ const CurveAnimation = forwardRef((props, ref) => {
     group.add(ringcover);
 
     const ring = new THREE.Mesh(
-      new THREE.RingGeometry(5.8, 6.85, 32),
+      new THREE.RingGeometry(5.8, 6.25, 32),
       new THREE.MeshBasicMaterial({
         color: 0xffffff,
         opacity: 0,
@@ -124,18 +127,22 @@ const CurveAnimation = forwardRef((props, ref) => {
 
     const render = () => {
       let progress: number;
-      animatestep = Math.max(
+      animatestep.current = Math.max(
         0,
-        Math.min(240, toend ? animatestep + 1 : animatestep - 4)
+        Math.min(
+          240,
+          toEndRef.current ? animatestep.current + 1 : animatestep.current - 4
+        )
       );
-      if (isListen) animatestep = 80;
-      acceleration = easing(animatestep, 0, 1, 240);
+      if (isListenRef.current) animatestep.current = 40;
+      if (isProcessRef.current) animatestep.current = 60;
+      acceleration.current = easing(animatestep.current, 0, 1, 240);
 
-      if (acceleration > 0.35) {
-        progress = (acceleration - 0.35) / 0.65;
+      if (acceleration.current > 0.35) {
+        progress = (acceleration.current - 0.35) / 0.65;
         group.rotation.y = (-Math.PI / 2) * progress;
         group.position.z = 50 * progress;
-        progress = Math.max(0, (acceleration - 0.97) / 0.03);
+        progress = Math.max(0, (acceleration.current - 0.97) / 0.03);
         curveMesh.material.opacity = 1 - progress;
         ringcover.material.opacity = ring.material.opacity = progress;
         ring.scale.x = ring.scale.y = 0.9 + 0.1 * progress;
@@ -146,7 +153,7 @@ const CurveAnimation = forwardRef((props, ref) => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      curveMesh.rotation.x += rotatevalue + acceleration;
+      curveMesh.rotation.x += rotatevalue + acceleration.current;
       render();
     };
     animate();
@@ -154,15 +161,26 @@ const CurveAnimation = forwardRef((props, ref) => {
     return () => canvasRef.current?.removeChild(renderer.domElement);
   }, []);
 
-  const start = () => {
-    toend = true;
-    isListen = true;
+  const listen = () => {
+    toEndRef.current = true;
+    isListenRef.current = true;
+    isProcessRef.current = false;
+  };
+
+  const process = () => {
+    toEndRef.current = true;
+    isListenRef.current = false;
+    isProcessRef.current = true;
+  };
+
+  const finish = () => {
+    toEndRef.current = true;
+    isListenRef.current = false;
+    isProcessRef.current = false;
   };
 
   const end = () => {
-    isListen = false;
-    toend = false;
-    console.log("toend: false")
+    toEndRef.current = false;
   };
 
   return <div ref={canvasRef} />;
