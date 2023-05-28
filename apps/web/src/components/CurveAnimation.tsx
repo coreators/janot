@@ -40,10 +40,10 @@ const CurveAnimation = forwardRef((props, ref) => {
 
   const length = 40;
   const rotatevalue = 0.035;
-  let acceleration = 0;
-  let animatestep = 0;
-  let toend = false;
-  let isListen = false;
+  let acceleration = useRef(0);
+  let animatestep = useRef(0);
+  let toEndRef = useRef(false);
+  let isListenRef = useRef(false);
 
   const canvasRef = useRef(null);
 
@@ -124,18 +124,18 @@ const CurveAnimation = forwardRef((props, ref) => {
 
     const render = () => {
       let progress: number;
-      animatestep = Math.max(
+      animatestep.current = Math.max(
         0,
-        Math.min(240, toend ? animatestep + 1 : animatestep - 4)
+        Math.min(240, toEndRef.current ? animatestep.current + 1 : animatestep .current- 4)
       );
-      if (isListen) animatestep = 80;
-      acceleration = easing(animatestep, 0, 1, 240);
+      if (isListenRef.current) animatestep.current = 80;
+      acceleration.current = easing(animatestep.current, 0, 1, 240);
 
-      if (acceleration > 0.35) {
-        progress = (acceleration - 0.35) / 0.65;
+      if (acceleration.current > 0.35) {
+        progress = (acceleration.current - 0.35) / 0.65;
         group.rotation.y = (-Math.PI / 2) * progress;
         group.position.z = 50 * progress;
-        progress = Math.max(0, (acceleration - 0.97) / 0.03);
+        progress = Math.max(0, (acceleration.current - 0.97) / 0.03);
         curveMesh.material.opacity = 1 - progress;
         ringcover.material.opacity = ring.material.opacity = progress;
         ring.scale.x = ring.scale.y = 0.9 + 0.1 * progress;
@@ -146,7 +146,7 @@ const CurveAnimation = forwardRef((props, ref) => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      curveMesh.rotation.x += rotatevalue + acceleration;
+      curveMesh.rotation.x += rotatevalue + acceleration.current;
       render();
     };
     animate();
@@ -155,13 +155,13 @@ const CurveAnimation = forwardRef((props, ref) => {
   }, []);
 
   const start = () => {
-    toend = true;
-    isListen = true;
+    toEndRef.current = true;
+    isListenRef.current = true;
   };
 
   const end = () => {
-    isListen = false;
-    toend = false;
+    isListenRef.current = false;
+    toEndRef.current = false;
     console.log("toend: false")
   };
 
