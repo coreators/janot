@@ -44,12 +44,15 @@ const CurveAnimation = forwardRef((props, ref) => {
   let animatestep = useRef(0);
   let toEndRef = useRef(false);
   let isListenRef = useRef(false);
+  let isProcessRef = useRef(false);
 
   const canvasRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    start,
-    end,
+    listen: listen,
+    process: process,
+    finish: finish,
+    end: end,
   }));
 
   useEffect(() => {
@@ -95,7 +98,7 @@ const CurveAnimation = forwardRef((props, ref) => {
     group.add(ringcover);
 
     const ring = new THREE.Mesh(
-      new THREE.RingGeometry(5.8, 6.85, 32),
+      new THREE.RingGeometry(5.8, 6.25, 32),
       new THREE.MeshBasicMaterial({
         color: 0xffffff,
         opacity: 0,
@@ -126,9 +129,13 @@ const CurveAnimation = forwardRef((props, ref) => {
       let progress: number;
       animatestep.current = Math.max(
         0,
-        Math.min(240, toEndRef.current ? animatestep.current + 1 : animatestep .current- 4)
+        Math.min(
+          240,
+          toEndRef.current ? animatestep.current + 1 : animatestep.current - 4
+        )
       );
-      if (isListenRef.current) animatestep.current = 80;
+      if (isListenRef.current) animatestep.current = 40;
+      if (isProcessRef.current) animatestep.current = 60;
       acceleration.current = easing(animatestep.current, 0, 1, 240);
 
       if (acceleration.current > 0.35) {
@@ -154,15 +161,26 @@ const CurveAnimation = forwardRef((props, ref) => {
     return () => canvasRef.current?.removeChild(renderer.domElement);
   }, []);
 
-  const start = () => {
+  const listen = () => {
     toEndRef.current = true;
     isListenRef.current = true;
+    isProcessRef.current = false;
+  };
+
+  const process = () => {
+    toEndRef.current = true;
+    isListenRef.current = false;
+    isProcessRef.current = true;
+  };
+
+  const finish = () => {
+    toEndRef.current = true;
+    isListenRef.current = false;
+    isProcessRef.current = false;
   };
 
   const end = () => {
-    isListenRef.current = false;
     toEndRef.current = false;
-    console.log("toend: false")
   };
 
   return <div ref={canvasRef} />;
