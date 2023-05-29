@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chengsokdara/use-whisper": "github:siisee11/use-whisper",
+    "@chengsokdara/use-whisper": "github:siisee11/use-whisper.git",
     "@ffmpeg/core": "^0.11.0",
     "@ffmpeg/ffmpeg": "^0.11.6",
     "@supabase/supabase-js": "^2.21.0",
