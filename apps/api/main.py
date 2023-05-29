@@ -11,8 +11,11 @@ from typing import Annotated, Optional
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.responses import FileResponse
+
 from fastapi.templating import Jinja2Templates
 from langchain.vectorstores import VectorStore
+import requests
 
 from callback import QuestionGenCallbackHandler, StreamingLLMCallbackHandler
 from query_data import get_chain
@@ -69,6 +72,39 @@ async def transcriptions(audioData: UploadFile,model: Annotated[str, Form()]):
 
     transcription = openai.Audio.transcribe("whisper-1", audio_file)
     return transcription
+
+@app.post("/tts")
+async def tts(text: Annotated[str, Form()]):
+    OUTPUT_FILE = "./tts/speech.mp3"
+    CHUNK_SIZE = 1024
+    elevenlabs_api_key = os.environ["ELEVENLABS_API_KEY"]
+    voice_id = os.environ["ELEVENLABS_VOICE_ID"]
+    tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
+    headers = {
+    "Accept": "application/json",
+    "xi-api-key": elevenlabs_api_key
+    }
+    headers["Content-Type"] = "application/json"
+
+    data = {
+        "text": text,
+        "model_id": "eleven_monolingual_v1",
+        "voice_settings": {
+            "stability": 0,
+            "similarity_boost":0 
+        }
+    }
+
+    response = requests.post(tts_url, json=data, headers=headers, stream=True)
+
+    with open(OUTPUT_FILE, 'wb+') as f:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
+
+    return FileResponse(OUTPUT_FILE, media_type="audio/mp3")
+
+
 
 @app.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket):
