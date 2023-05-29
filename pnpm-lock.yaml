@@ -70,9 +70,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@chengsokdara/use-whisper':
-        specifier: github:siisee11/use-whisper.git
-        version: github.com/siisee11/use-whisper/21bce43be20387e78ab96a9e48bfe92fb9e925b3(react@18.2.0)
       '@ffmpeg/core':
         specifier: ^0.11.0
         version: 0.11.0
@@ -115,6 +112,9 @@ importers:
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
+      use-whisper:
+        specifier: github:siisee11/use-whisper.git
+        version: github.com/siisee11/use-whisper/e524c793164d9b5ffdbbe696f6ce7c3ed43cf479(react@18.2.0)
     devDependencies:
       '@types/formidable':
         specifier: ^2.0.6
@@ -6816,11 +6816,11 @@ packages:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
 
-  github.com/siisee11/use-whisper/21bce43be20387e78ab96a9e48bfe92fb9e925b3(react@18.2.0):
-    resolution: {tarball: https://codeload.github.com/siisee11/use-whisper/tar.gz/21bce43be20387e78ab96a9e48bfe92fb9e925b3}
-    id: github.com/siisee11/use-whisper/21bce43be20387e78ab96a9e48bfe92fb9e925b3
-    name: '@chengsokdara/use-whisper'
-    version: 0.2.0
+  github.com/siisee11/use-whisper/e524c793164d9b5ffdbbe696f6ce7c3ed43cf479(react@18.2.0):
+    resolution: {tarball: https://codeload.github.com/siisee11/use-whisper/tar.gz/e524c793164d9b5ffdbbe696f6ce7c3ed43cf479}
+    id: github.com/siisee11/use-whisper/e524c793164d9b5ffdbbe696f6ce7c3ed43cf479
+    name: use-whisper
+    version: 0.2.1
     peerDependencies:
       react: '*'
     dependencies:
