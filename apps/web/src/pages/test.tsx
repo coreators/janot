@@ -1,7 +1,7 @@
 import Head from "next/head";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import useWhisper from "@chengsokdara/use-whisper";
+import useWhisper from "use-whisper";
 
 
 export default function TestPage() {

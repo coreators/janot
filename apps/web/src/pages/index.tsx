@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import CurveAnimation from "../components/CurveAnimation";
-import useWhisper from "@chengsokdara/use-whisper";
+import useWhisper from "use-whisper";
 
 import axios from "axios";
 
