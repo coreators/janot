@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "janot"
+version = "0.1.0"
+description = ""
+authors = ["Sanghyeok Park <ray5273@naver.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+streamlit-pydantic = "^0.6.0"
+streamlit-searchbox = "^0.1.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

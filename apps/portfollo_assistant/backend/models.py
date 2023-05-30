@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-# user model
+# user model DB와 그대로 연동되는 부분인듯.
 class User(Base):
     __tablename__ = "users"
 
@@ -11,3 +11,5 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+
+

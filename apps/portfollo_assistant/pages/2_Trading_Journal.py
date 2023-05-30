@@ -1,4 +1,10 @@
 import streamlit as st
+from pydantic import BaseModel, Field
+import streamlit_pydantic as sp
+from streamlit_searchbox import st_searchbox
+import sys,os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from backend.schema import KorBuyJournalModel, KorSellJournalModel
 
 st.markdown("# Trading Journal")
 st.sidebar.markdown("# Trading Journal")
@@ -33,11 +39,30 @@ st.sidebar.markdown(
     """
 )
 
+# 아래 내용을 ticker DB 혹은 검색과 연동시키기
+def search_ticker(searchterm: str) -> list[str]:
+    if searchterm == "":
+        return []
+    else:
+        return ["hello", "world"]
+
+
 with total:
     st.title("All Accounts")
 
 with korea:
     st.title("Korea Accounts")
+    buy_or_sell = st.sidebar.selectbox("매수 매도 선택", ["매수", "매도"])
+    # 아래 내용을 매수 일지 추가하는 탭에다가 넣든지 옮기기
+    if buy_or_sell == "매수":
+        st.markdown("# 매수 일지 작성")
+        st_searchbox(search_ticker, key="ticker_searchbox")
+        data = sp.pydantic_form(key="buy_model", model=KorBuyJournalModel)
+    else:
+        st.markdown("# 매도 일지 작성")
+        data = sp.pydantic_form(key="sell_model", model=KorSellJournalModel)
+    st.info("키움증권의 수수료율은 0.01% 입니다")
+
 
 with usa:
     st.title("USA Accounts")
