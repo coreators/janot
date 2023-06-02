@@ -17,8 +17,9 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+
 class KorBuyJournalModel(BaseModel):
-    ticker: str = Field(..., description="티커를 입력하세요") # 잘못된 티커에 대해서 처리를 해야함.
+    ticker: str = Field(..., description="티커를 입력하세요",) # 잘못된 티커에 대해서 처리를 해야함.
     price: int = Field(..., description="매수가격을 입력하세요")
     amount: int = Field(..., description="수량을 입력하세요")
     date: datetime.date = Field(..., description="매수/매도 일자를 지정해주세요")
