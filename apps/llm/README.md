@@ -18,7 +18,7 @@ Models should be placed inside the `models/` folder.
 [Hugging Face](https://huggingface.co/models?pipeline_tag=text-generation&sort=downloads) is the main place to download models. These are some examples:
 
 * [WizardLM 7B](https://huggingface.co/TheBloke/WizardLM-7B-uncensored-GGML)
-* [Guanaco 7b](https://huggingface.co/TheBloke/guanaco-7B-GGML)
+* [Guanaco 7B](https://huggingface.co/TheBloke/guanaco-7B-GGML)
 
 You can automatically download a model from HF using the cript `download-model.py`:
 
