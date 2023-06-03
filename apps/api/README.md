@@ -18,7 +18,8 @@ poetry install
 ``` 
 
 ### Load Documents into memory
-First, locate your .pdf, .csv, .txt files in SOURCE_DOCUMENTS
+First, locate your .pdf, .csv, .txt, .obs files in SOURCE_DOCUMENTS
+(Write obisidian root path into .obs file to load obsidian)
 
 Second, run ingest script. 
 ```
