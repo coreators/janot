@@ -3,13 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "export NODE_ENV=dev && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@chengsokdara/use-whisper": "github:siisee11/use-whisper.git",
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.6",
     "@supabase/supabase-js": "^2.21.0",
+    "axios": "^1.4.0",
+    "formidable": "^2.1.1",
     "langchain": "^0.0.72",
     "next": "latest",
     "next-pwa": "^5.6.0",
@@ -21,6 +26,7 @@
     "ui": "workspace:*"
   },
   "devDependencies": {
+    "@types/formidable": "^2.0.6",
     "@types/node": "^18.11.17",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",

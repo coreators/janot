@@ -1,10 +1,74 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import useWhisper from "@chengsokdara/use-whisper";
+
+
 export default function TestPage() {
   const [inputText, setInputText] = useState<string>("");
   const [buttonLabel, setButtonLabel] = useState<string>("Send");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [ws , setWs] = useState<WebSocket>(null)
+
+
+  const onTranscribe = async (blob: Blob) => {
+    const formdata = new FormData();
+    const file = new File([blob], "speech.mp3", {
+      type: "audio/mpeg",
+    });
+    formdata.append("audioData", file, "speech.mp3");
+    formdata.append("model", "whisper-1");
+
+    const url = "http://localhost:9000/transcriptions";
+    const response = await axios.post(url, formdata, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    const { text } = await response.data
+    // you must return result from your server in Transcript format
+    return {
+      blob,
+      text,
+    }
+  }
+
+  const streamToServer = async (blob) => {
+    const formdata = new FormData();
+    const file = new File([blob], "speech.mp3", {
+      type: "audio/mpeg",
+    });
+    formdata.append("audioData", file, "speech.mp3");
+    formdata.append("model", "whisper-1");
+
+    const url = "http://localhost:9000/transcriptions";
+    const response = await axios.post(url, formdata, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    const { text } = await response.data
+    // you must return result from your server in Transcript format
+    return {
+      blob,
+      text,
+    }
+  }
+
+  const {
+    recording,
+    speaking,
+    transcribing,
+    transcript,
+    pauseRecording,
+    startRecording,
+    stopRecording,
+  } = useWhisper({
+    // streaming: true,
+    whisperConfig: {
+      language: "ko"
+    },
+    // useCustomServer: true,
+    onTranscribe,
+    // onDataAvailable: streamToServer,
+  })
+
 
   useEffect(() => {
     const endpoint = "ws://localhost:9000/chat";
@@ -66,6 +130,8 @@ export default function TestPage() {
     }
   }, [])
 
+
+
   function sendMessage(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
@@ -87,12 +153,12 @@ export default function TestPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2 ">
       <Head>
-        <title>OS-J</title>
+        <title>JANOT</title>
       </Head>
 
       <main className="mx-auto w-auto px-4 pt-16 pb-8 sm:pt-24 lg:px-8">
         <h1 className="mt-24 mx-auto text-center text-2xl font-thin tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-4xl">
-          OS-J
+          JANOT
         </h1>
         <p className="card-text text-center text-sm text-white" id="header">
           Ask a question
@@ -115,6 +181,18 @@ export default function TestPage() {
             {buttonLabel}
           </button>
         </div>
+
+        <div>
+          <p>Recording: {recording}</p>
+          <p>Speaking: {speaking}</p>
+          <p>Transcribing: {transcribing}</p>
+          <p>Transcribed Text: {transcript.text}</p>
+          <button onClick={() => startRecording()}>Start</button>
+          <button onClick={() => pauseRecording()}>Pause</button>
+          <button onClick={() => stopRecording()}>Stop</button>
+        </div>
+
+        <p>{transcript.text}</p>
         <div id="messages" className="overflow-auto text-white"></div>
       </main>
     </div>

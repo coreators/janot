@@ -140,3 +140,5 @@ python.langchain.com/
 *vectorstore.pkl
 
 example_data
+
+*.mp3
