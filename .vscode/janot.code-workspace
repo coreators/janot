@@ -9,6 +9,10 @@
       "path": "../apps/api"
     },
     {
+      "name": "apps/llm",
+      "path": "../apps/llm"
+    },
+    {
       "name": "apps/web",
       "path": "../apps/web"
     }
