@@ -5,19 +5,32 @@
 
 [ref](https://medium.com/@caetanoog/start-your-first-fastapi-server-with-poetry-in-10-minutes-fef90e9604d9)
 
-### langchain chat example
-run ingest.sh
+## How to run
+### Setup environment
+First, run virtual environment. 
 ```
-$ sh ingest.sh
+poetry shell
 ```
-create vectorstore
+
+Second, install requirement packages. 
 ```
-run ingest.py
+poetry install
+``` 
+
+### Load Documents into memory
+First, locate your .pdf, .csv, .txt files in SOURCE_DOCUMENTS
+
+Second, run ingest script. 
 ```
-start server
+python ingest.py
+```
+
+### Start FASTAPI server
+
 ```
 make start
 ```
+
 
 ### API Document
 
@@ -25,15 +38,13 @@ make start
 [Redoc](http://127.0.0.1:9000/redoc)
 
 
-### Commands
-
-`poetry shell` : run poetry virtual env
-`poetry install` : install packages
-`uvicorn main:app --reload` : start server
-
-
 ### Additional Commands
-`poetry add <package-name>`
+To install package
+
+```
+poetry add <package-name>
+```
+
 
 ### Env variable
 ```

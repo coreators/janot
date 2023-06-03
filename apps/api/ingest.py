@@ -1,48 +1,49 @@
 """Load html from files, clean up, split, ingest into Weaviate."""
+import os
 import pickle
+from typing import List
 
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import ReadTheDocsLoader
+from langchain.docstore.document import Document
+from langchain.document_loaders import TextLoader, PyPDFLoader, CSVLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 
+from constant import SOURCE_DIRECTORY
+
+def load_single_document(file_path: str) -> Document:
+    # Loads a single document from a file path
+    if file_path.endswith(".txt"):
+        loader = TextLoader(file_path, encoding="utf8")
+    elif file_path.endswith(".pdf"):
+        loader = PyPDFLoader(file_path)
+    elif file_path.endswith(".csv"):
+        loader = CSVLoader(file_path)
+    return loader.load()[0]
+
+
+def load_documents(source_dir: str) -> List[Document]:
+    # Loads all documents from source documents directory
+    all_files = os.listdir(source_dir)
+    return [load_single_document(f"{source_dir}/{file_path}") for file_path in all_files if file_path[-4:] in ['.txt', '.pdf', '.csv'] ]
+
 
 def ingest_docs():
     """Get documents from web pages."""
-    loader = ReadTheDocsLoader("python.langchain.com/en/latest/")
-    raw_documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-    )
-    documents = text_splitter.split_documents(raw_documents)
-    print(documents)
+
+    print(f"Loading documents from {SOURCE_DIRECTORY}")
+    documents = load_documents(SOURCE_DIRECTORY)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    texts = text_splitter.split_documents(documents)
+    print(f"Loaded {len(documents)} documents from {SOURCE_DIRECTORY}")
+    print(f"Split into {len(texts)} chunks of text")
+
     embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(documents, embeddings)
+    vectorstore = FAISS.from_documents(texts, embeddings)
 
     # Save vectorstore
     with open("vectorstore.pkl", "wb") as f:
         pickle.dump(vectorstore, f)
 
-
-def ingest_pdf():
-    loader = PyPDFLoader("example_data/Jaeyoun_s_CV.pdf")
-    raw_documents = loader.load_and_split()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-    )
-    documents = text_splitter.split_documents(raw_documents)
-    print(documents)
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(documents, embeddings)
-
-    # Save vectorstore
-    with open("janot-vectorstore.pkl", "wb") as f:
-        pickle.dump(vectorstore, f)
-
-
 if __name__ == "__main__":
-    # ingest_docs()
-    ingest_pdf()
+    ingest_docs()

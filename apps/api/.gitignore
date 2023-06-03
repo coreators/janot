@@ -139,6 +139,6 @@ dmypy.json
 python.langchain.com/
 *vectorstore.pkl
 
-example_data
+SOURCE_DOCUMENTS
 
 *.mp3
