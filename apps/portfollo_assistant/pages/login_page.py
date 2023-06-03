@@ -31,12 +31,13 @@ def show_main_page():
         st.success("Login successful")
         show_pages(
             [
-                Page("pages/1_Portfolio.py", "Portfolio", "💸"),
+                Page("pages/1_Portfolio.py", "My Stocks", "💸"),
                 Page("pages/2_Trading_Journal.py", "Trading Journal", "📝"),
                 Page("pages/3_Monthly_trade.py", "Monthly Trade", "📈️"),
                 Page("pages/4_Daily_News.py", "Daily News", "📰"),
                 Page("pages/5_My_Watchlist.py", "My Watchlist", "👀"),
                 Page("pages/6_AI_Assistant.py", "AI Asisstant", "🤖"),
+                Page("pages/7_buy_and_sell_records.py", "Buy Sell Records", "➕"),
             ]
         )
         hide_pages(

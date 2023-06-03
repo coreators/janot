@@ -5,12 +5,14 @@ from streamlit_searchbox import st_searchbox
 import sys,os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from backend.schema import KorBuyJournalModel, KorSellJournalModel
+from pathlib import Path
 
-# "st.session_state object:" , st.session_state
+import pandas as pd
 
 st.markdown("# Trading Journal")
 st.sidebar.markdown("# Trading Journal")
 
+buy_or_sell = st.sidebar.selectbox("매수 매도 선택", ["매수", "매도"])
 
 total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA',"Dollar"])
 st.sidebar.success("Trading Journal 📝")
@@ -41,65 +43,12 @@ st.sidebar.markdown(
     """
 )
 
-buy_or_sell = st.sidebar.selectbox("매수 매도 선택", ["매수", "매도"])
-
-def sync_with_tickerbox():
-    # TODO : sync with search value
-    st.session_state.ticker = "hello"
-
-def send_buy_journal(ticker, buy_price, buy_amount, buy_date, tax, fee):
-    # TODO : send buy journal to backend
-    print("buy",ticker, buy_price, buy_amount, buy_date, tax, fee)
-    pass
-
-def send_sell_journal(ticker, sell_price, sell_amount, sell_date, tax, fee):
-    # TODO : send sell journal to backend
-    print("sell",ticker, sell_price, sell_amount, sell_date, tax, fee)
-    pass
-
 with total:
     st.empty()
     st.title("All Accounts")
 
 with korea:
     st.title("Korea Accounts")
-    # 아래 내용을 매수 일지 추가하는 탭에다가 넣든지 옮기기
-    if buy_or_sell == "매수":
-        st.empty()
-        st.title("한국 주식 매수 일지 작성")
-        st.text("티커를 입력하세요")
-        # pandas나 numpy로 배열 바꿀 수 있음. box를 yahoo finance에서 가져온 data frame으로 바꾸기
-        search_box = st.selectbox("회사 이름", ["hello", "world"], key="ticker_searchbox", on_change=sync_with_tickerbox)
-        st.info("회사 이름을 입력하면 해당 티커를 아래 박스에 자동으로 채워줍니다.")
-        # schema.py : ticker price amount date tax fee
-        ticker = st.text_input("티커",disabled=True, key="ticker", value="ticker") # 회사이름으로 ticker 검색해서 ticker 부분에 넣기
-        buy_price = st.number_input("매수 가격", key="buy_price", min_value=0, value=0, step=100, format=None)
-        buy_amount = st.number_input("매수 수량", key="buy_amount", min_value=0, value=0, step=1, format=None)
-        buy_date = st.date_input("매수 일자", key="buy_date", value=None, min_value=None, max_value=None, help=None)
-        tax = st.number_input("수수료율", key="tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
-        submit = st.button("Submit")
-        if submit:
-            send_buy_journal(ticker, buy_price, buy_amount, buy_date, tax, fee)
-            # add error handling
-    else:
-        st.empty()
-        st.title("한국 주식 매도 일지 작성")
-        st.text("티커를 입력하세요")
-        # pandas나 numpy로 배열 바꿀 수 있음. box를 yahoo finance에서 가져온 data frame으로 바꾸기
-        search_box = st.selectbox("회사 이름", ["hello", "world"], key="ticker_searchbox", on_change=sync_with_tickerbox)
-        st.info("회사 이름을 입력하면 해당 티커를 아래 박스에 자동으로 채워줍니다.")
-        # schema.py : ticker price amount date tax fee
-        ticker = st.text_input("티커",disabled=True, key="ticker", value="ticker") # 회사이름으로 ticker 검색해서 ticker 부분에 넣기
-        sell_price = st.number_input("매도 가격", key="buy_price", min_value=0, value=0, step=100, format=None)
-        sell_amount = st.number_input("매도 수량", key="buy_amount", min_value=0, value=0, step=1, format=None)
-        sell_date = st.date_input("매도 일자", key="buy_date", value=None, min_value=None, max_value=None, help=None)
-        tax = st.number_input("수수료율", key="tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
-        submit = st.button("Submit")
-        if submit:
-            send_sell_journal(ticker, sell_price, sell_amount, sell_date, tax, fee)
-            # add error handling
 
 with usa:
     st.empty()
