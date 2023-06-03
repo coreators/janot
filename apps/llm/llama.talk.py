@@ -3,7 +3,8 @@ import subprocess
 import gradio as gr
 from llama_cpp import Llama
 
-llama = Llama(model_path='./models/TheBloke_WizardLM-7B-uncensored-GGML/WizardLM-7B-uncensored.ggmlv3.q4_0.bin', verbose=False)
+model_path = './models/TheBloke_WizardLM-7B-uncensored-GGML/WizardLM-7B-uncensored.ggmlv3.q4_0.bin'
+llama = Llama(model_path=model_path, verbose=False)
 
 
 def say(text: str):
