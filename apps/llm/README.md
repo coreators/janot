@@ -41,3 +41,28 @@ Before start change `model_path` in `llama.talk.py`.
 ```
 python llama.talk.py
 ```
+
+## Web Server
+
+`llama-cpp-python` offers a web server which aims to 
+act as a drop-in replacement for the OpenAI API. This allows you to use llama.cpp compatible models with any OpenAI compatible client (language libraries, services, etc).
+
+To install the server package and get started:
+
+```
+pip install llama-cpp-python[server]
+python3 -m llama_cpp.server --model models/7B/ggml-model.bin
+```
+
+You can use local `llm` instead `OpenAI` in langchain.
+
+```python
+import os
+
+from langchain.llms import OpenAI
+
+os.environ["OPENAI_API_KEY"] = "sk-xxxxxxxx" # can be anything
+os.environ["OPENAI_API_BASE"] = "http://localhost:8000/v1"
+
+llms = OpenAI()
+```
