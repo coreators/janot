@@ -8,6 +8,8 @@ import axios from "axios";
 export default function Home() {
   const [ws, setWs] = useState<WebSocket>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const audioRef = useRef(null);
+
 
   const onTranscribe = async (blob: Blob) => {
     if (childRef.current) {
@@ -28,7 +30,7 @@ export default function Home() {
     const { text } = await response.data;
     // you must return result from your server in Transcript format
     if (childRef.current) {
-      console.log("finish")
+      console.log("finish");
       childRef.current.finish();
     }
 
@@ -65,8 +67,6 @@ export default function Home() {
     end: () => {},
   });
 
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
   const listen = () => {
     // stt
     if (childRef.current) {
@@ -88,7 +88,7 @@ export default function Home() {
     const endpoint = "ws://localhost:9000/chat";
     const ws = new WebSocket(endpoint);
 
-    ws.onmessage = function (event) {
+    ws.onmessage = async function (event) {
       const messages = document.getElementById("messages");
       const data = JSON.parse(event.data);
       if (data.sender === "bot") {
@@ -99,7 +99,6 @@ export default function Home() {
           p.innerHTML = "JANOT: ";
           div.appendChild(p);
           messages.appendChild(div);
-
         } else if (data.type === "stream") {
           const p = messages.lastChild.lastChild as HTMLParagraphElement;
           if (data.message === "\n") {
@@ -109,6 +108,25 @@ export default function Home() {
           }
         } else if (data.type === "info") {
         } else if (data.type === "end") {
+          const p = messages.lastChild.lastChild as HTMLParagraphElement;
+          const finalText = (p.innerHTML).split("JANOT: ")[1];
+          const enableTTS = false;
+          // Call tts
+          if (enableTTS) {
+            const formdata = new FormData();
+            formdata.append("text", finalText);
+            const url = "http://localhost:9000/tts";
+            const response = await axios.post(url, formdata, {
+              headers: { "Content-Type": "multipart/form-data" },
+              responseType: "blob",
+            });
+            const audioURL = URL.createObjectURL(response.data);
+            const audioElement = audioRef.current;
+            audioElement.src = audioURL;
+            audioElement.play();
+          }
+
+
           if (childRef.current) {
             console.log("end");
             childRef.current.end();
@@ -176,6 +194,7 @@ export default function Home() {
             className="overflow-auto text-center text-xl font-thin tracking-tight text-white"
           ></div>
         </div>
+        <audio ref={audioRef} controls />
       </main>
     </div>
   );
