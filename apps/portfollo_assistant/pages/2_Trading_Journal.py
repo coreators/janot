@@ -4,10 +4,14 @@ import streamlit_pydantic as sp
 from streamlit_searchbox import st_searchbox
 import sys,os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from backend.schema import KorBuyJournalModel, KorSellJournalModel
+from backend.schemas import KorBuyJournalModel, KorSellJournalModel
 from pathlib import Path
 
 import pandas as pd
+
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
 
 st.markdown("# Trading Journal")
 st.sidebar.markdown("# Trading Journal")

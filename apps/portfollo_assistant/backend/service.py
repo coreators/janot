@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import models, schema
+from . import models, schemas
 
 
 # user 관련은 user_service.py
@@ -12,14 +12,14 @@ from . import models, schema
 # finance 정보 가져와서 계산하는거는 어디서해야할지?
 
 # login 시, user 정보를 가져옴
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
-
-# sign in 시, user 정보를 전달
-def create_user(db: Session, user: schema.UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = models.User(username=user.username, email=user.email, hashed_password=fake_hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+# def get_user(db: Session, user_id: int):
+#     return db.query(models.User).filter(models.User.id == user_id).first()
+#
+# # sign in 시, user 정보를 전달
+# def create_user(db: Session, user: schemas.UserCreate):
+#     fake_hashed_password = user.password + "notreallyhashed"
+#     db_user = models.User(username=user.username, email=user.email, hashed_password=fake_hashed_password)
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user

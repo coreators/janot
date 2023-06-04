@@ -1,5 +1,8 @@
 import streamlit as st
 
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
 st.set_page_config(
     page_title="My Portfolio",
     page_icon="👋",
@@ -17,7 +20,7 @@ with usa:
     # 샀을때의 환율
     # 기존에 가지고 있던 달러로 했으면 그대로 써주기
 
-
+st.write(st.session_state["username"],"님 환영합니다.")
 
 st.markdown("# Portfolio page 💸")
 st.sidebar.success("Portfolio Page 💸")

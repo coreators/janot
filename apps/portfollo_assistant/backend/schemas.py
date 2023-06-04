@@ -3,11 +3,16 @@ import datetime
 # user schema
 # TODO : portfolio schema, trading_journal schema, monthly_trade schema, daily_news schema, my_watchlist schema, ai_assistant schema
 
+
+# Including pydantic field type
 class UserBase(BaseModel):
-    username: str
     email: str
 
 class UserCreate(UserBase):
+    username: str
+    password: str
+
+class UserLogin(UserBase):
     password: str
 
 class User(UserBase):
@@ -18,6 +23,7 @@ class User(UserBase):
         orm_mode = True
 
 
+# models와 동일한지 확인하기
 class KorBuyJournalModel(BaseModel):
     ticker: str = Field(..., description="티커를 입력하세요",) # 잘못된 티커에 대해서 처리를 해야함.
     price: int = Field(..., description="매수가격을 입력하세요")

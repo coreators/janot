@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 from st_pages import show_pages, Page, hide_pages
 
 st.set_page_config(
@@ -10,20 +11,10 @@ headerSection = st.container()
 loginSection = st.container()
 mainSection = st.container()
 logoutSection = st.container()
+
 loginSessionState = 'loggedIn'
+usernameSession = 'username'
 
-
-# Create an empty container
-actual_email = "email"
-actual_password = "password"
-
-# login() function access to database server and check username and password exist
-def login(username, password):
-    # TODO : remove this
-    return True
-    if username == actual_email and password == actual_password:
-        return True
-    return False
 
 def show_main_page():
     with mainSection:
@@ -37,7 +28,7 @@ def show_main_page():
                 Page("pages/4_Daily_News.py", "Daily News", "📰"),
                 Page("pages/5_My_Watchlist.py", "My Watchlist", "👀"),
                 Page("pages/6_AI_Assistant.py", "AI Asisstant", "🤖"),
-                Page("pages/7_buy_and_sell_records.py", "Buy Sell Records", "➕"),
+                Page("pages/7_Buy_and_sell_records.py", "Buy Sell Records", "➕"),
             ]
         )
         hide_pages(
@@ -48,8 +39,24 @@ def show_main_page():
             ]
         )
 
+# login() function access to database server and check username and password exist
+def login(email, password):
+    response = requests.post('http://localhost:9000/login',
+                             json={'email': email, 'password': password})
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+    # session state를 바깥에서 변경할 수 있는지 확인해보기
+    # session state 기반으로 데이터 출력하기
+    # st.session_state["username"] = username
+
+
 def logout_btn_clicked():
     st.session_state[loginSessionState] = False
+    st.session_state[usernameSession] = None
+    st.success("User logged out successfully")
+
 def show_logout_page():
     logoutSection.empty()
     with logoutSection:
@@ -60,10 +67,12 @@ def show_logout_page():
 def login_btn_clicked(email, password):
     if login(email, password):
         st.session_state[loginSessionState] = True
+        st.session_state[usernameSession] = email
+        st.success("logged in successfully")
     else:
         st.session_state[loginSessionState] = False
-        st.error("Invalid User")
-
+        st.session_state[usernameSession] = None
+        st.error("Failed to login")
 def show_login_page():
     with loginSection:
         st.markdown("#### Login ")
@@ -76,6 +85,7 @@ def show_login_page():
 with headerSection.form("login"):
     if loginSessionState not in st.session_state:
         st.session_state[loginSessionState] = False
+        st.session_state[usernameSession] = None
         show_login_page()
     else:
         if st.session_state[loginSessionState]:

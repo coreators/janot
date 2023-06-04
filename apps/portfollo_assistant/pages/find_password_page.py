@@ -1,5 +1,8 @@
 import streamlit as st
 
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
 placeholder = st.empty()
 
 

@@ -1,5 +1,9 @@
 import streamlit as st
 
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
+
 st.markdown("# AI Assistant page 🤖")
 st.sidebar.markdown("# AI Assistant page 🤖")
 

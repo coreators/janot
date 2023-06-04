@@ -1,5 +1,9 @@
 import streamlit as st
 
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
+
 st.markdown("# Monthly Trade 📈")
 st.sidebar.markdown("# Monthly Trade 📈")
 

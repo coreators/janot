@@ -1,5 +1,9 @@
 import streamlit as st
 
+usernameSession = 'username'
+userSession = st.session_state[usernameSession]
+
+
 st.markdown("# Daily News 📰")
 st.sidebar.markdown("# Daily News 📰")
 
