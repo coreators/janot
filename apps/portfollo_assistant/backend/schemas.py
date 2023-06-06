@@ -47,3 +47,20 @@ class UsaJournalCreate(BaseModel):
     exchange_rate: float
     is_buy: bool # 매수인지 매도인지 구분하는 변수
     sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+
+
+
+# email과, is_buy를 제외하고 가져오기
+# is_buy 여부는 request에서 처리해주기
+class KorJournalRead(BaseModel):
+    ticker: str
+    price: int
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    is_buy: bool
+
+class KorJournalReadRequest(BaseModel):
+    email: str

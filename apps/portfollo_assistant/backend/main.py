@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from models import User, KorDailyJournal, UsaDailyJournal
 from database import SessionLocal, engine, get_db
-from schemas import UserCreate ,UserLogin, KorJournalCreate, UsaJournalCreate
-
+from schemas import UserCreate ,UserLogin, KorJournalCreate, UsaJournalCreate, KorJournalReadRequest, KorJournalRead
+from typing import List
 
 
 from passlib.context import CryptContext
@@ -99,6 +99,13 @@ async def add_usa_journal(usaJournal: UsaJournalCreate, db: Session = Depends(ge
     db.add(new_usa_buy_journal)
     db.commit()
     return {"message": "Usa buy journal added successfully"}
+
+
+@app.get("/api/v1/journal/kor/read", response_model=List[KorJournalRead]) #KorJournalRead는 schemas.py에 정의되어있음, Pydantic 클래스임
+async def read_kor_journal(korJournalReadRequest: KorJournalReadRequest, db: Session = Depends(get_db)):
+    kor_journal_db = db.query(KorDailyJournal).filter(KorDailyJournal.email == korJournalReadRequest.email).all() # query 안엔 sqlalchemy의 모델을 넣어야함.
+    kor_journal = [KorJournalRead(**{k: v for k, v in item.__dict__.items() if not k.startswith('_')}) for item in kor_journal_db] # 받아온걸 pydantic 클래스로 변환
+    return kor_journal
 
 
 if __name__ == "__main__":

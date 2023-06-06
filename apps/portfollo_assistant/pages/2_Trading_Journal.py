@@ -7,6 +7,8 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from backend.schemas import KorJournalCreate
 from pathlib import Path
 import pandas as pd
+import requests
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode, JsCode , ColumnsAutoSizeMode
 
 usernameSession = 'username'
 userSession = st.session_state[usernameSession]
@@ -14,6 +16,7 @@ userSession = st.session_state[usernameSession]
 
 st.markdown("# Trading Journal")
 st.sidebar.markdown("# Trading Journal")
+st.write(userSession + " hello!")
 
 buy_or_sell = st.sidebar.selectbox("매수 매도 선택", ["매수", "매도"])
 
@@ -46,12 +49,87 @@ st.sidebar.markdown(
     """
 )
 
+kor_list = pd.read_csv("resources/kor_ticker_list.csv")
+@st.cache_data()
+def fetch_data():
+    response = requests.get('http://localhost:9000/api/v1/journal/kor/read',
+                             json={'email': userSession})
+    print("fecth data : ", response , "user name : ",userSession)
+    df = pd.DataFrame(response.json())
+    df = df.rename(columns={
+        "ticker": "종목명",
+        "price": "매수/매도 가격",
+        "amount": "수량",
+        "date": "매수/매도 일자",
+        "fee": "수수료",
+        "tax": "세금",
+        "sector": "섹터",
+        "is_buy": "매수/매도"})
+    name_dict = kor_list.set_index('Code').to_dict()['Name']
+    # Ticker로 저장된 DB값을 종목명으로 치환해주기
+    df['종목명'] = df['종목명'].map(name_dict).fillna(df['종목명'])
+    df['매수/매도'] = df['매수/매도'].map({True: "매수", False: "매도"})
+    if response.status_code == 200:
+        return df
+    else:
+        return pd.DataFrame()
+
+def create_aggrid_table():
+    df = fetch_data()
+    gb = GridOptionsBuilder.from_dataframe(df)
+
+    #customize gridOptions
+    #gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+    #gb.configure_column("date_only", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd', pivot=True)
+    #gb.configure_column("date_tz_aware", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd HH:mm zzz', pivot=True)
+
+    #gb.configure_column("apple", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2, aggFunc='sum')
+    #gb.configure_column("banana", type=["numericColumn", "numberColumnFilter", "customNumericFormat"], precision=1, aggFunc='avg')
+    #gb.configure_column("chocolate", type=["numericColumn", "numberColumnFilter", "customCurrencyFormat"], custom_currency_symbol="R$", aggFunc='max')
+
+
+    cellsytle_jscode = JsCode("""
+    function(params) {
+        if (params.value == 'A') {
+            return {
+                'color': 'white',
+                'backgroundColor': 'darkred'
+            }
+        } else {
+            return {
+                'color': 'black',
+                'backgroundColor': 'white'
+            }
+        }
+    };
+    """)
+    gb.configure_column("group", cellStyle=cellsytle_jscode)
+    gb.configure_side_bar()
+    gb.configure_grid_options(domLayout='normal')
+    gridOptions = gb.build()
+    AgGrid(df,gridOptions=gridOptions,
+           height=1000,
+           width='100%',
+           columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
+           allow_unsafe_jscode=True,
+           enable_enterprise_modules=True)
+
+
+
 with total:
     st.empty()
+    col1, col2, col3 = st.columns(3)
+    # 비중을 이런걸로 표시해도 UI가 괜찮을듯
+    col1.metric("총 자산", "70 °F", "1.2 °F")
+    col2.metric("한국 주식", "9 mph", "-8%")
+    col3.metric("미국 주식", "86%", "4%")
     st.title("All Accounts")
 
 with korea:
     st.title("Korea Accounts")
+    fetch_data()
+    create_aggrid_table()
+
 
 with usa:
     st.empty()
