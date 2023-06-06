@@ -4,9 +4,8 @@ import streamlit_pydantic as sp
 from streamlit_searchbox import st_searchbox
 import sys,os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from backend.schemas import KorBuyJournalModel, KorSellJournalModel
+from backend.schemas import KorJournalCreate
 from pathlib import Path
-
 import pandas as pd
 
 usernameSession = 'username'

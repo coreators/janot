@@ -15,11 +15,9 @@ logoutSection = st.container()
 loginSessionState = 'loggedIn'
 usernameSession = 'username'
 
-
 def show_main_page():
     with mainSection:
         st.title("Portfolio Service")
-        st.success("Login successful")
         show_pages(
             [
                 Page("pages/1_Portfolio.py", "My Stocks", "💸"),
@@ -39,10 +37,12 @@ def show_main_page():
             ]
         )
 
+
 # login() function access to database server and check username and password exist
 def login(email, password):
     response = requests.post('http://localhost:9000/login',
                              json={'email': email, 'password': password})
+    print("login response: ", response)
     if response.status_code == 200:
         return True
     else:
@@ -63,7 +63,7 @@ def show_logout_page():
         st.button("Log out", key="logout",on_click=logout_btn_clicked)
         st.sidebar.button("Log out", key="logout_sidebar",on_click=logout_btn_clicked)
 
-# loginBtnClicked() function handle when login butten clicked case
+
 def login_btn_clicked(email, password):
     if login(email, password):
         st.session_state[loginSessionState] = True

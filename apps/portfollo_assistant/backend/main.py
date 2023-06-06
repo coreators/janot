@@ -3,9 +3,10 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
-from models import User, KorDailyJournal
+from models import User, KorDailyJournal, UsaDailyJournal
 from database import SessionLocal, engine, get_db
-from schemas import UserCreate ,UserLogin
+from schemas import UserCreate ,UserLogin, KorJournalCreate, UsaJournalCreate
+
 
 
 from passlib.context import CryptContext
@@ -66,8 +67,39 @@ async def login_user(user: UserLogin, db: Session = Depends(get_db)):       # Us
         return {"message": "Incorrect password"}
     return {"message": "Logged in successfully"}
 
+@app.post("/api/v1/journal/kor/trade")
+async def add_kor_journal(korJournal: KorJournalCreate, db: Session = Depends(get_db)):
+    new_kor_buy_journal = KorDailyJournal(
+        email=korJournal.email,
+        ticker=korJournal.ticker,
+        price=korJournal.price,
+        amount=korJournal.amount,
+        date=korJournal.date,
+        tax=korJournal.tax,
+        fee=korJournal.fee,
+        is_buy=korJournal.is_buy,
+        sector=korJournal.sector)
+    db.add(new_kor_buy_journal)
+    db.commit()
+    return {"message": "Kor buy journal added successfully"}
 
-# front에서 보낸 데이터를 받아서 처리하는 방법은 어떻게 하는지 알아보기
+@app.post("/api/v1/journal/usa/trade")
+async def add_usa_journal(usaJournal: UsaJournalCreate, db: Session = Depends(get_db)):
+    new_usa_buy_journal = UsaDailyJournal(
+        email=usaJournal.email,
+        ticker=usaJournal.ticker,
+        price=usaJournal.price,
+        amount=usaJournal.amount,
+        date=usaJournal.date,
+        tax=usaJournal.tax,
+        fee=usaJournal.fee,
+        exchange_rate=usaJournal.exchange_rate,
+        is_buy=usaJournal.is_buy,
+        sector=usaJournal.sector)
+    db.add(new_usa_buy_journal)
+    db.commit()
+    return {"message": "Usa buy journal added successfully"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=9000)

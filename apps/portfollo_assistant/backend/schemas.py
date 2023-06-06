@@ -24,18 +24,26 @@ class User(UserBase):
 
 
 # models와 동일한지 확인하기
-class KorBuyJournalModel(BaseModel):
-    ticker: str = Field(..., description="티커를 입력하세요",) # 잘못된 티커에 대해서 처리를 해야함.
-    price: int = Field(..., description="매수가격을 입력하세요")
-    amount: int = Field(..., description="수량을 입력하세요")
-    date: datetime.date = Field(..., description="매수/매도 일자를 지정해주세요")
-    tax: float = Field(..., description="수수료율을 선택하세요") # 수수료율 설명을 추가하기
-    fee: float = Field(..., description="거래세율을 선택하세요") # 거래세율 설명을 추가하기 얘는 넣을지 말지 고민해보기
 
-class KorSellJournalModel(BaseModel):
-    ticker: str = Field(..., description="티커를 입력하세요") # 잘못된 티커에 대해서 처리를 해야함.
-    price: int = Field(..., description="매도 가격을 입력하세요")
-    amount: int = Field(..., description="매도 수량을 입력하세요") # 가지고 있는것 이상으로 처리하지 못하게 하기
-    date: datetime.date = Field(..., description="매도 일자를 지정해주세요")
-    tax: float = Field(..., description="수수료율을 선택하세요") # 수수료율 설명을 추가하기
-    fee: float = Field(..., description="거래세율을 선택하세요") # 거래세율 설명을 추가하기 얘는 넣을지 말지 고민해보기
+class KorJournalCreate(BaseModel):
+    email: str                         # user_id는 자동으로 생성되는 것으로 하기
+    ticker: str                        # ticker는 유니크한 값으로 하기
+    price: int                         # price per share (원화로)
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    is_buy: bool # 매수인지 매도인지 구분하는 변수
+    sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+
+class UsaJournalCreate(BaseModel):
+    email: str
+    ticker: str
+    price: float
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    exchange_rate: float
+    is_buy: bool # 매수인지 매도인지 구분하는 변수
+    sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
