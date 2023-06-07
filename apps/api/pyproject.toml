@@ -28,6 +28,7 @@ supabase = "^1.0.3"
 pypdf = "^3.8.1"
 python-multipart = "^0.0.6"
 aiofiles = "^23.1.0"
+llama-cpp-python = "^0.1.57"
 
 
 [build-system]

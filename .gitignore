@@ -36,3 +36,4 @@ yarn-error.log*
 dist/
 apps/web/public/sw.js.map
 .vercel
+/apps/llm/models/
