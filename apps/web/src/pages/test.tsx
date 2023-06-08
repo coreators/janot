@@ -19,7 +19,7 @@ export default function TestPage() {
     formdata.append("audioData", file, "speech.mp3");
     formdata.append("model", "whisper-1");
 
-    const url = "http://localhost:9000/transcriptions";
+    const url = `${process.env.API_SERVER_URL}/transcriptions`;
     const response = await axios.post(url, formdata, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -39,7 +39,7 @@ export default function TestPage() {
     formdata.append("audioData", file, "speech.mp3");
     formdata.append("model", "whisper-1");
 
-    const url = "http://localhost:9000/transcriptions";
+    const url = `${process.env.API_SERVER_URL}/transcriptions`;
     const response = await axios.post(url, formdata, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -71,7 +71,7 @@ export default function TestPage() {
 
 
   useEffect(() => {
-    const endpoint = "ws://localhost:9000/chat";
+    const endpoint = `${process.env.API_SERVER_WEB_SOCKET}/chat`;
     const ws = new WebSocket(endpoint);
 
     ws.onmessage = function (event) {

@@ -7,15 +7,15 @@ import axios from "axios";
 
 export default function Home() {
   const [ws, setWs] = useState<WebSocket>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
   const audioRef = useRef(null);
 
 
   const onTranscribe = async (blob: Blob) => {
     if (childRef.current) {
-      childRef.current.process();
+      childRef.current.run();
     }
-    setIsProcessing(true);
+    setIsRunning(true);
     const formdata = new FormData();
     const file = new File([blob], "speech.mp3", {
       type: "audio/mpeg",
@@ -23,7 +23,7 @@ export default function Home() {
     formdata.append("audioData", file, "speech.mp3");
     formdata.append("model", "whisper-1");
 
-    const url = "http://localhost:9000/transcriptions";
+    const url = `${process.env.API_SERVER_URL}/transcriptions`;
     const response = await axios.post(url, formdata, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -62,7 +62,7 @@ export default function Home() {
 
   const childRef = useRef({
     listen: () => {},
-    process: () => {},
+    run: () => {},
     finish: () => {},
     end: () => {},
   });
@@ -78,14 +78,14 @@ export default function Home() {
     // start listen animation (breathing)
   };
 
-  const process = async () => {
+  const run = async () => {
     // start processing animation (fast spin)
     stopRecording();
     // -> onTranscribe
   };
 
   useEffect(() => {
-    const endpoint = "ws://localhost:9000/chat";
+    const endpoint = `${process.env.API_SERVER_WEB_SOCKET}/chat`;
     const ws = new WebSocket(endpoint);
 
     ws.onmessage = async function (event) {
@@ -115,7 +115,7 @@ export default function Home() {
           if (enableTTS) {
             const formdata = new FormData();
             formdata.append("text", finalText);
-            const url = "http://localhost:9000/tts";
+            const url = `${process.env.API_SERVER_URL}/tts`;
             const response = await axios.post(url, formdata, {
               headers: { "Content-Type": "multipart/form-data" },
               responseType: "blob",
@@ -131,9 +131,9 @@ export default function Home() {
             console.log("end");
             childRef.current.end();
           }
-          setIsProcessing(false);
+          setIsRunning(false);
         } else if (data.type === "error") {
-          setIsProcessing(false);
+          setIsRunning(false);
           const p = messages.lastChild.lastChild as HTMLParagraphElement;
           p.innerHTML += data.message;
         }
@@ -174,8 +174,8 @@ export default function Home() {
       className="flex min-h-screen flex-col items-center justify-center py-2 "
       onMouseDown={() => listen()}
       onTouchStart={() => listen()}
-      onMouseUp={() => process()}
-      onTouchEnd={() => process()}
+      onMouseUp={() => run()}
+      onTouchEnd={() => run()}
     >
       <Head>
         <title>JANOT</title>
