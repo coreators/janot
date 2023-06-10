@@ -48,8 +48,20 @@ poetry add <package-name>
 
 
 ### Env variable
+
+mac
 ```
 brew install direnv
+
+```
+
+ubuntu
+```
+$ apt install direnv
+$ vim ~/.bashrc
+
+add eval "$(direnv hook bash)"
+
 ```
 
 
