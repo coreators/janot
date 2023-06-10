@@ -23,7 +23,8 @@ export default function Home() {
     formdata.append("audioData", file, "speech.mp3");
     formdata.append("model", "whisper-1");
 
-    const url = `${process.env.API_SERVER_URL}/transcriptions`;
+    const url = `${process.env.NEXT_PUBLIC_API_SERVER_URL}/transcriptions`;
+    console.log("url", url)
     const response = await axios.post(url, formdata, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -85,7 +86,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const endpoint = `${process.env.API_SERVER_WEB_SOCKET}/chat`;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_SERVER_WEB_SOCKET}/chat`;
     const ws = new WebSocket(endpoint);
 
     ws.onmessage = async function (event) {
@@ -115,7 +116,7 @@ export default function Home() {
           if (enableTTS) {
             const formdata = new FormData();
             formdata.append("text", finalText);
-            const url = `${process.env.API_SERVER_URL}/tts`;
+            const url = `${process.env.NEXT_PUBLIC_API_SERVER_URL}/tts`;
             const response = await axios.post(url, formdata, {
               headers: { "Content-Type": "multipart/form-data" },
               responseType: "blob",
