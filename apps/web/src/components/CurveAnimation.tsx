@@ -44,13 +44,13 @@ const CurveAnimation = forwardRef((props, ref) => {
   let animatestep = useRef(0);
   let toEndRef = useRef(false);
   let isListenRef = useRef(false);
-  let isProcessRef = useRef(false);
+  let isRunningRef = useRef(false);
 
   const canvasRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     listen: listen,
-    process: process,
+    run: run,
     finish: finish,
     end: end,
   }));
@@ -135,7 +135,7 @@ const CurveAnimation = forwardRef((props, ref) => {
         )
       );
       if (isListenRef.current) animatestep.current = 40;
-      if (isProcessRef.current) animatestep.current = 60;
+      if (isRunningRef.current) animatestep.current = 60;
       acceleration.current = easing(animatestep.current, 0, 1, 240);
 
       if (acceleration.current > 0.35) {
@@ -164,19 +164,19 @@ const CurveAnimation = forwardRef((props, ref) => {
   const listen = () => {
     toEndRef.current = true;
     isListenRef.current = true;
-    isProcessRef.current = false;
+    isRunningRef.current = false;
   };
 
-  const process = () => {
+  const run = () => {
     toEndRef.current = true;
     isListenRef.current = false;
-    isProcessRef.current = true;
+    isRunningRef.current = true;
   };
 
   const finish = () => {
     toEndRef.current = true;
     isListenRef.current = false;
-    isProcessRef.current = false;
+    isRunningRef.current = false;
   };
 
   const end = () => {
