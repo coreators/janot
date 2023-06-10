@@ -50,32 +50,57 @@ st.sidebar.markdown(
 )
 
 kor_list = pd.read_csv("resources/kor_ticker_list.csv")
-@st.cache_data()
+
+# 유저의 모든 데이터를 긁어와서 화면에 표시해주기
+# @st.cache_data()
 def fetch_data():
     response = requests.get('http://localhost:9000/api/v1/journal/kor/read',
                              json={'email': userSession})
-    print("fecth data : ", response , "user name : ",userSession)
+    print("fetch data : ", response , "user name : ",userSession)
+
+    # 0. email에 해당하는 매수/매도 데이터들 다 긁어오기
     df = pd.DataFrame(response.json())
+
+
+    # 1. 날짜를 내림차순으로 정렬
+    df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
+    df = df.sort_values(by=['date'], ascending=False)
+
     df = df.rename(columns={
         "ticker": "종목명",
-        "price": "매수/매도 가격",
+        "price": "가격",
         "amount": "수량",
         "date": "매수/매도 일자",
         "fee": "수수료",
         "tax": "세금",
         "sector": "섹터",
-        "is_buy": "매수/매도"})
+        "is_buy": "매수/매도",
+        "profit_loss":"매도 손익"})
     name_dict = kor_list.set_index('Code').to_dict()['Name']
-    # Ticker로 저장된 DB값을 종목명으로 치환해주기
+
+
+
+    # 2. Ticker로 저장된 DB값을 종목명으로 치환해주고, True/False를 매수/매도로 치환해줌.
     df['종목명'] = df['종목명'].map(name_dict).fillna(df['종목명'])
     df['매수/매도'] = df['매수/매도'].map({True: "매수", False: "매도"})
+
+    # 3. 기존 인덱스를 삭제하고 종목명으로 인덱스 설정
+    df.set_index('종목명',inplace=True)
+
+    # 4. 출력 필요없는 항목들 제거
+    del df['transaction_id']
+    del df['세금']
+    del df['수수료']
+    del df['sold_amount']
     if response.status_code == 200:
         return df
     else:
         return pd.DataFrame()
 
-def create_aggrid_table():
+def create_table():
     df = fetch_data()
+    st.dataframe(df,use_container_width=True)
+    return
     gb = GridOptionsBuilder.from_dataframe(df)
 
     #customize gridOptions
@@ -128,7 +153,7 @@ with total:
 with korea:
     st.title("Korea Accounts")
     fetch_data()
-    create_aggrid_table()
+    create_table()
 
 
 with usa:

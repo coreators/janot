@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 import datetime
 # user schema
 # TODO : portfolio schema, trading_journal schema, monthly_trade schema, daily_news schema, my_watchlist schema, ai_assistant schema
@@ -23,7 +24,6 @@ class User(UserBase):
         orm_mode = True
 
 
-# models와 동일한지 확인하기
 
 class KorJournalCreate(BaseModel):
     email: str                         # user_id는 자동으로 생성되는 것으로 하기
@@ -35,6 +35,22 @@ class KorJournalCreate(BaseModel):
     fee: int
     is_buy: bool # 매수인지 매도인지 구분하는 변수
     sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    sold_amount: int          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
+    profit_loss: int          # 매수일때는 사용하지 않음.
+
+# 매도를 위한 매수 Update
+class KorJournalUpdate(BaseModel):
+    transaction_id: int
+    ticker: str
+    price: int
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    is_buy: bool # 매수인지 매도인지 구분하는 변수
+    sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    sold_amount: int          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
+    profit_loss: int          # 매수일때는 사용하지 않음.
 
 class UsaJournalCreate(BaseModel):
     email: str
@@ -47,12 +63,17 @@ class UsaJournalCreate(BaseModel):
     exchange_rate: float
     is_buy: bool # 매수인지 매도인지 구분하는 변수
     sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    sold_amount: int          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
+    profit_loss: int          # 매수일때는 사용하지 않음.
+
+    # 매도 개수 : 0으로 추가하기
 
 
 
 # email과, is_buy를 제외하고 가져오기
 # is_buy 여부는 request에서 처리해주기
 class KorJournalRead(BaseModel):
+    transaction_id: int
     ticker: str
     price: int
     amount: int
@@ -61,6 +82,13 @@ class KorJournalRead(BaseModel):
     fee: int
     sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
     is_buy: bool
+    sold_amount: Optional[int]          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
+    profit_loss: Optional[int]          # 매수일때는 사용하지 않음.
 
 class KorJournalReadRequest(BaseModel):
     email: str
+
+
+class KorJournalBuyRecords(BaseModel):
+    email : str
+    ticker : str

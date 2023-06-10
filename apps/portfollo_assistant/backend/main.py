@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from models import User, KorDailyJournal, UsaDailyJournal
 from database import SessionLocal, engine, get_db
-from schemas import UserCreate ,UserLogin, KorJournalCreate, UsaJournalCreate, KorJournalReadRequest, KorJournalRead
+from schemas import UserCreate ,UserLogin, KorJournalCreate,KorJournalUpdate,\
+    UsaJournalCreate, KorJournalReadRequest, KorJournalRead, KorJournalBuyRecords
 from typing import List
 
 
@@ -78,7 +79,9 @@ async def add_kor_journal(korJournal: KorJournalCreate, db: Session = Depends(ge
         tax=korJournal.tax,
         fee=korJournal.fee,
         is_buy=korJournal.is_buy,
-        sector=korJournal.sector)
+        sector=korJournal.sector,
+        sold_amount=korJournal.sold_amount,
+        profit_loss=korJournal.profit_loss)
     db.add(new_kor_buy_journal)
     db.commit()
     return {"message": "Kor buy journal added successfully"}
@@ -95,17 +98,36 @@ async def add_usa_journal(usaJournal: UsaJournalCreate, db: Session = Depends(ge
         fee=usaJournal.fee,
         exchange_rate=usaJournal.exchange_rate,
         is_buy=usaJournal.is_buy,
-        sector=usaJournal.sector)
+        sector=usaJournal.sector,
+        sold_amount=usaJournal.sold_amount,
+        profit_loss=usaJournal.profit_loss)
     db.add(new_usa_buy_journal)
     db.commit()
     return {"message": "Usa buy journal added successfully"}
-
 
 @app.get("/api/v1/journal/kor/read", response_model=List[KorJournalRead]) #KorJournalRead는 schemas.py에 정의되어있음, Pydantic 클래스임
 async def read_kor_journal(korJournalReadRequest: KorJournalReadRequest, db: Session = Depends(get_db)):
     kor_journal_db = db.query(KorDailyJournal).filter(KorDailyJournal.email == korJournalReadRequest.email).all() # query 안엔 sqlalchemy의 모델을 넣어야함.
     kor_journal = [KorJournalRead(**{k: v for k, v in item.__dict__.items() if not k.startswith('_')}) for item in kor_journal_db] # 받아온걸 pydantic 클래스로 변환
     return kor_journal
+
+@app.get("/api/v1/journal/kor/buy/record", response_model=List[KorJournalRead])
+async def read_kor_check_amount(korJournalBuyRecords: KorJournalBuyRecords, db: Session = Depends(get_db)):
+    kor_journal_db = db.query(KorDailyJournal)\
+        .filter(KorDailyJournal.email == korJournalBuyRecords.email)\
+        .filter(KorDailyJournal.ticker == korJournalBuyRecords.ticker)\
+        .filter(KorDailyJournal.is_buy == True).all()
+    kor_journal = [KorJournalRead(**{k: v for k, v in item.__dict__.items() if not k.startswith('_')}) for item in kor_journal_db] # 받아온걸 pydantic 클래스로 변환
+    return kor_journal
+
+@app.put("/api/v1/journal/kor/buy/update")
+async def update_kor_buy_record(korJournal: List[KorJournalUpdate], db: Session = Depends(get_db)):
+    try:
+        db.bulk_update_mappings(KorDailyJournal, korJournal)
+        db.commit()
+    except:
+        db.rollback()
+    return {"message": "Kor buy journal updated successfully"}
 
 
 if __name__ == "__main__":

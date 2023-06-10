@@ -27,6 +27,8 @@ class KorDailyJournal(Base):
     fee = Column(Integer)
     is_buy = Column(Boolean) # 매수인지 매도인지 구분하는 변수
     sector = Column(String) # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    sold_amount = Column(Integer)
+    profit_loss = Column(Integer)
 
 class UsaDailyJournal(Base):
     __tablename__ = "usa_daily_journal"
