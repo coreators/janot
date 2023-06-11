@@ -113,8 +113,8 @@ with korea:
         buy_price = st.number_input("매수 가격", key="buy_price", min_value=0, value=0, step=100, format=None)
         buy_amount = st.number_input("매수 수량", key="buy_amount", min_value=1, value=1, step=1, format=None)
         buy_date = st.date_input("매수 일자", key="buy_date", value=None, min_value=None, max_value=datetime.date.today(), help=None)
-        tax = st.number_input("수수료율", key="tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
+        tax = st.number_input("수수료율", key="tax", min_value=0.0, value=0.2, step=0.01, format=None, help="한국 주식 매도 수수료는 0.2% 입니다")
+        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.00, step=0.01, format=None, help="한국 주식 매수 거레세율은 0% 입니다")
         submit = st.button(label="Submit",key="kor_buy_submit")
         if submit:
             response = send_buy_journal(ticker, buy_price, buy_amount, buy_date, tax, fee, sector)
@@ -140,8 +140,8 @@ with korea:
         sell_price = st.number_input("매도 가격", key="buy_price", min_value=0, value=0, step=100, format=None)
         sell_amount = st.number_input("매도 수량", key="buy_amount", min_value=1, value=1, step=1, format=None)
         sell_date = st.date_input("매도 일자", key="buy_date", value=None, min_value=None, max_value=datetime.date.today(), help=None)
-        tax = st.number_input("수수료율", key="tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
+        tax = st.number_input("수수료율", key="tax", min_value=0.000, value=0.015, step=0.001, format="%.3f", help="한국 주식 매도 수수료는 0.015% 입니다")
+        fee = st.number_input("거래세율", key="fee", min_value=0.0, value=0.2, step=0.01, format=None, help="한국 주식 매도 거래세율은 0.2% 입니다")
         submit = st.button(label="Submit",key="kor_sell_submit")
         if submit:
             # 매도 가능한 기록이 있는지 확인
@@ -166,7 +166,7 @@ with korea:
                 st.error(msg)
                 st.stop()
 
-            #remaining amount는 필요없으므로 삭제
+            # remaining amount는 필요없으므로 삭제
             buy_record_df = buy_record_df.drop(['remaining_amount'], axis=1)
             print(buy_record_df)
 
@@ -242,8 +242,8 @@ with usa:
         buy_price = st.number_input("매수 가격", key="usa_buy_price", min_value=0.0, value=0.0, step=0.01, format=None)
         buy_amount = st.number_input("매수 수량", key="usa_buy_amount", min_value=1, value=1, step=1, format=None)
         buy_date = st.date_input("매수 일자", key="usa_buy_date", value=None, min_value=None, max_value=datetime.date.today(), help=None)
-        tax = st.number_input("수수료율", key="usa_tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="usa_fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
+        tax = st.number_input("수수료율", key="usa_tax", min_value=0.0, value=0.07, step=0.01, format=None, help="키움증권 미국 주식 매매 혜택 수수료율은 0.07% 입니다")
+        fee = st.number_input("거래세율", key="usa_fee", min_value=0.0, value=0.0, step=0.01, format=None, help="미국 주식 매수 거래세율은 0% 입니다")
         exchange_rate = st.number_input("환율", key="exchange_rate", min_value=0.0, value=1300.00, step=0.01, format=None, help="달러당 원화 환율을 입력해주세요")
         submit = st.button(label="Submit",key="usa_buy_submit")
         if submit:
@@ -269,8 +269,8 @@ with usa:
         buy_price = st.number_input("매도 가격", key="usa_buy_price", min_value=0.0, value=0.0, step=0.01, format=None)
         buy_amount = st.number_input("매도 수량", key="usa_buy_amount", min_value=1, value=1, step=1, format=None)
         buy_date = st.date_input("매도 일자", key="usa_buy_date", value=None, min_value=None, max_value=datetime.date.today(), help=None)
-        tax = st.number_input("수수료율", key="usa_tax", min_value=0.0, value=0.05, step=0.01, format=None, help="키움증권의 수수료율은 0.05% 입니다")
-        fee = st.number_input("거래세율", key="usa_fee", min_value=0.0, value=0.01, step=0.01, format=None, help="키움증권의 수수료율은 0.01% 입니다")
+        tax = st.number_input("수수료율", key="usa_tax", min_value=0.0, value=0.07, step=0.01, format=None, help="키움증권 미국 주식 매매 혜택 수수료율은 0.07% 입니다")
+        fee = st.number_input("거래세율", key="usa_fee", min_value=0.0, value=0.0008, step=0.0001, format="%.4f", help="미국 주식 매수 거래세율은 0.0008% 입니다")
         exchange_rate = st.number_input("환율", key="exchange_rate", min_value=0.0, value=1300.00, step=0.01, format=None, help="달러당 원화 환율을 입력해주세요")
         submit = st.button(label="Submit",key="usa_sell_submit")
         if submit:

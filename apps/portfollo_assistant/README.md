@@ -5,12 +5,22 @@
 * poetry
 * uvicorn
 * pydantic
+* sqlalchemy
+* Postgresql
+
+
+### Python Library
+* financedatareader
+* pandas
+* yfinance
 
 ### Run Frontend - Streamlit
 * streamlit
 * st-pages (streamlit-multiapps)
 * streamlit-pydantic
 * streamlit-searchbox
+* plotly
+
 ```
 streamlit run main_app.py
 ```

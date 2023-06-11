@@ -1,4 +1,8 @@
 import streamlit as st
+import requests
+import pandas as pd
+import FinanceDataReader as fdr
+import plotly.express as px
 
 usernameSession = 'username'
 userSession = st.session_state[usernameSession]
@@ -7,6 +11,113 @@ st.set_page_config(
     page_title="My Portfolio",
     page_icon="👋",
 )
+
+kor_list = pd.read_csv("resources/kor_ticker_list.csv")
+
+# Get user portfolio data
+@st.cache_data()
+def fetch_kor_data():
+    response = requests.get('http://localhost:9000/api/v1/journal/kor/read',
+                            json={'email': userSession})
+    print("fetch data : ", response , "user name : ",userSession)
+
+    # 0. email에 해당하는 매수/매도 데이터들 다 긁어오기
+    df = pd.DataFrame(response.json())
+
+
+    # 1. 날짜를 내림차순으로 정렬
+    df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
+    df = df.sort_values(by=['date'], ascending=True)
+    print(df)
+    df = df.rename(columns={
+        "ticker": "티커",
+        "price": "매수 가격",
+        "amount": "매수 수량",
+        "date": "매수/매도 일자",
+        "fee": "수수료",
+        "tax": "세금",
+        "sector": "섹터",
+        "is_buy": "매수/매도",
+        "sold_amount": "매도 수량",
+        "profit_loss": "매도 손익"})
+    name_dict = kor_list.set_index('Code').to_dict()['Name']
+
+    # TODO: 매도 자료는 총 손익등에 사용하긴해야함
+
+    # 2. Ticker로 저장된 DB값을 통해서 종목명 컬럼을 생성
+    df['종목명'] = df['티커'].map(name_dict).fillna(df['티커'])
+
+    # 3. 매수 자료만 남기기
+    df = df[df['매수/매도'] == True]
+
+    # 보유수량, 총 투자액, 보유 투자액
+    df['보유 수량'] = df['매수 수량'] - df['매도 수량']
+    # 수량이 없으면 제외
+    df = df[df['보유 수량'] > 0]
+    df['총 투자액'] = df['보유 수량'] * df['매수 가격']
+
+    # 3. 기존 인덱스를 삭제하고 종목명으로 인덱스 설정
+
+    # 4. 출력 필요없는 항목들 제거 (나중에 변경가능)
+    del df['transaction_id']
+    del df['세금']
+    del df['수수료']
+    del df['매도 손익']
+
+    # 5. 보유수량, 평균단가, 총투자금, 현재주가, 평가수익률, 평가손익, 평가금액, 비중, 섹터 (매매 시작일)
+    df = df.groupby('종목명').agg({
+        '티커': 'first',
+        '보유 수량': 'sum',
+        '매수/매도 일자': 'first',
+        '섹터': 'first',
+        '총 투자액':'sum',}).reset_index()
+
+    # 포트폴리오 종목들을 기준으로 현재가격을 가져오기
+    for idx, row in df.iterrows():
+        df.loc[idx, '현재 주가'] = fdr.DataReader(row['티커'])['Close'][-1]
+    df['현재 주가'] = df['현재 주가'].astype(int)
+    print(df)
+
+    # 보유 투자액 / 보유 수량 == df['평균 단가']
+    df['평균 단가'] = df['총 투자액'] / df['보유 수량']
+    df['평균 단가'] = df['평균 단가'].astype(int)
+
+    # 평가손익, 평가수익률, 평가금액, 비중 계산
+    df['평가 손익'] = (df['현재 주가'] - df['평균 단가']) * df['보유 수량']
+    df['평가 수익률'] = (df['현재 주가'] - df['평균 단가']) / df['평균 단가'] * 100
+    df['평가 금액'] = df['현재 주가'] * df['보유 수량']
+    # 비중 =  해당 종목 평가 금액 / 총 평가금액 *100
+    df['비중'] = df['평가 금액'] / df['평가 금액'].sum() * 100
+
+    # 새로운 칼럼 순서 정리
+    columns = ['종목명','평균 단가','보유 수량','총 투자액','평가 금액','현재 주가','평가 손익','평가 수익률','매수/매도 일자','섹터','비중']
+    df = df[columns]
+    df.set_index('종목명',inplace=True)
+
+
+
+    if response.status_code == 200:
+        return df
+    else:
+        return pd.DataFrame()
+
+
+def create_portfolio_table():
+    df = fetch_kor_data()
+    st.dataframe(df, use_container_width=True)
+
+def create_pie_chart_by_stockname():
+    df = fetch_kor_data()
+    fig1 = px.pie(df, values='평가 금액', names=df.index, title='종목별 비중')
+    st.plotly_chart(fig1, use_container_width=True)
+
+def create_pie_chart_by_section():
+    df = fetch_kor_data()
+    fig2 = px.pie(df, values='평가 금액', names='섹터', title='섹터별 비중')
+    st.plotly_chart(fig2, use_container_width=True)
+
+
+
 total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA','Dollar'])
 
 with total:
@@ -14,6 +125,15 @@ with total:
 
 with korea:
     st.title("Korea Accounts")
+    # 1. 주식 별로 매수 기록 다 불러와서 오름차순으로 정렬하기
+    # 2. 매도기록에 대한 실현 손익 column을 생성해준다. 매수기록과 매도기록 매칭은 어떻게해? -> 찾아서 지우기? -> 지우면 월별 매매기록이 안보여
+    # 3. 개수나눠서 어떻게 처리하지 매도량 update하기? -> 매도 입력시에 매수 기록의 매도량 update 필요
+    # 4. 매도가격 측정은? -> 매도 기록 옆에 매수 가격 컬럼 추가해서 관리 -> 매도 입력시에 추가 처리 필요
+    # 5. 그것의 합을 구하면 해당 월의 실현손익일듯.
+    create_portfolio_table()
+    create_pie_chart_by_stockname()
+    create_pie_chart_by_section()
+
 
 with usa:
     st.title("USA Accounts")
@@ -69,11 +189,18 @@ st.markdown(
     - 주식 병합 처리도 해야 할 듯.
     - 상장 폐지 처리
     - 배당금 처리
+    - 정렬해서 볼수있어야함. 
+    보유수량, 단가, 투자금, 현재주가, 평가수익률, 섹터, 비중, 수수료, 고점 대비 하락율, 매매 시작 시점, 메모 (는 어떻게 저장할지는 모르겠네)
+
+    (Optional) 월당 수익률 (기간당 수익률)
     
+     주식 섹터별 비중 그래프 및 표
     
-    종목명	매매 시작일	보유수량	평균단가	총 투자금	현재주가	평가 수익률	평가 손익	평가금액	"매매 비용
+     주식 종목별 비중 그래프 및 표
     
-    (수수료+제세금)"	실현 수익률	실현손익	종목 설명	비중	포트	52주 최고점 ($)	고점대비 하락률
+     실현 손익
+    
+     평가 손익
 	
 	자산비중							
     현금	100%		평가 손익합			달러당 환율	
