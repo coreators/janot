@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from models import User, KorDailyJournal, UsaDailyJournal
 from database import SessionLocal, engine, get_db
 from schemas import UserCreate ,UserLogin, KorJournalCreate,KorJournalUpdate,\
-    UsaJournalCreate, KorJournalReadRequest, KorJournalRead, KorJournalBuyRecords
+    UsaJournalCreate, KorJournalReadRequest, KorJournalRead, KorJournalBuyRecords, \
+    UsaJournalRead, UsaJournalReadRequest, UsaJournalReadBuyRecords, UsaJournalUpdate
 from typing import List
 
 
@@ -100,7 +101,8 @@ async def add_usa_journal(usaJournal: UsaJournalCreate, db: Session = Depends(ge
         is_buy=usaJournal.is_buy,
         sector=usaJournal.sector,
         sold_amount=usaJournal.sold_amount,
-        profit_loss=usaJournal.profit_loss)
+        profit_loss=usaJournal.profit_loss,
+        profit_loss_with_exchange=usaJournal.profit_loss_with_exchange)
     db.add(new_usa_buy_journal)
     db.commit()
     return {"message": "Usa buy journal added successfully"}
@@ -124,6 +126,30 @@ async def read_kor_check_amount(korJournalBuyRecords: KorJournalBuyRecords, db: 
 async def update_kor_buy_record(korJournal: List[KorJournalUpdate], db: Session = Depends(get_db)):
     try:
         db.bulk_update_mappings(KorDailyJournal, korJournal)
+        db.commit()
+    except:
+        db.rollback()
+    return {"message": "Kor buy journal updated successfully"}
+
+@app.get("/api/v1/journal/usa/read", response_model=List[UsaJournalRead]) #KorJournalRead는 schemas.py에 정의되어있음, Pydantic 클래스임
+async def read_usa_journal(usaJournalReadRequest: UsaJournalReadRequest, db: Session = Depends(get_db)):
+    usa_journal_db = db.query(UsaDailyJournal).filter(UsaDailyJournal.email == usaJournalReadRequest.email).all()
+    usa_journal = [UsaJournalRead(**{k: v for k, v in item.__dict__.items() if not k.startswith('_')}) for item in usa_journal_db] # 받아온걸 pydantic 클래스로 변환
+    return usa_journal
+
+@app.get("/api/v1/journal/usa/buy/record", response_model=List[UsaJournalRead])
+async def read_usa_check_amount(usaJournalReadBuyRecords: UsaJournalReadBuyRecords, db: Session = Depends(get_db)):
+    usa_journal_db = db.query(UsaDailyJournal) \
+        .filter(UsaDailyJournal.email == usaJournalReadBuyRecords.email) \
+        .filter(UsaDailyJournal.ticker == usaJournalReadBuyRecords.ticker) \
+        .filter(UsaDailyJournal.is_buy == True).all()
+    usa_journal = [UsaJournalRead(**{k: v for k, v in item.__dict__.items() if not k.startswith('_')}) for item in usa_journal_db] # 받아온걸 pydantic 클래스로 변환
+    return usa_journal
+
+@app.put("/api/v1/journal/usa/buy/update")
+async def update_kor_buy_record(usaJournal: List[UsaJournalUpdate], db: Session = Depends(get_db)):
+    try:
+        db.bulk_update_mappings(UsaDailyJournal, usaJournal)
         db.commit()
     except:
         db.rollback()

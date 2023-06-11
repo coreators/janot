@@ -61,13 +61,26 @@ class UsaJournalCreate(BaseModel):
     tax: int
     fee: int
     exchange_rate: float
-    is_buy: bool # 매수인지 매도인지 구분하는 변수
-    sector: str # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
+    is_buy: bool
+    sector: str
     sold_amount: int          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
-    profit_loss: int          # 매수일때는 사용하지 않음.
+    profit_loss: float          # 매수일때는 사용하지 않음.
+    profit_loss_with_exchange: float
 
-    # 매도 개수 : 0으로 추가하기
-
+class UsaJournalUpdate(BaseModel):
+    transaction_id: int
+    ticker: str
+    price: float
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    exchange_rate: float
+    is_buy: bool
+    sector: str
+    sold_amount: int
+    profit_loss: float
+    profit_loss_with_exchange: float
 
 
 # email과, is_buy를 제외하고 가져오기
@@ -88,7 +101,29 @@ class KorJournalRead(BaseModel):
 class KorJournalReadRequest(BaseModel):
     email: str
 
-
 class KorJournalBuyRecords(BaseModel):
     email : str
     ticker : str
+
+class UsaJournalRead(BaseModel):
+    transaction_id: int
+    ticker: str
+    price: float
+    amount: int
+    date: datetime.date
+    tax: int
+    fee: int
+    exchange_rate: float
+    is_buy: bool
+    sector: str
+    sold_amount: Optional[int]          # 매수이나 매도된적 없거나 매도일때는 사용하지 않음.
+    profit_loss: Optional[float]
+    profit_loss_with_exchange: Optional[float]
+
+
+class UsaJournalReadRequest(BaseModel):
+    email: str
+
+class UsaJournalReadBuyRecords(BaseModel):
+    email: str
+    ticker: str

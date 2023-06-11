@@ -35,7 +35,7 @@ class UsaDailyJournal(Base):
     transaction_id = Column(Integer, primary_key=True, index=True) # id는 자동으로 생성되는 것으로 하기
     email = Column(String, ForeignKey("portfoliouser.email")) # user_id는 자동으로 생성되는 것으로 하기
     ticker = Column(String)   # ticker는 유니크한 값으로 하기
-    price = Column(Numeric)                            # price per share
+    price = Column(Numeric)   # price per share
     amount = Column(Integer)
     date = Column(DateTime)
     tax = Column(Integer)
@@ -43,6 +43,7 @@ class UsaDailyJournal(Base):
     exchange_rate = Column(Numeric)
     is_buy = Column(Boolean) # 매수인지 매도인지 구분하는 변수
     sector = Column(String) # 주식이 어디 산업에 해당하는지 기록, 저장 하는게 편하긴할듯.
-
-# 미국주식용 클래스 작성하기
+    sold_amount = Column(Integer)
+    profit_loss = Column(Numeric) # in dollars
+    profit_loss_with_exchange = Column(Numeric) # in won
 
