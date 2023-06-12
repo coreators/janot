@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import FinanceDataReader as fdr
 import plotly.express as px
+import datetime
 
 usernameSession = 'username'
 userSession = st.session_state[usernameSession]
@@ -196,6 +197,7 @@ def fetch_usa_data():
     else:
         return pd.DataFrame()
 
+
 def create_portfolio_table(df):
     st.dataframe(df, use_container_width=True)
 
@@ -207,12 +209,119 @@ def create_pie_chart_by_section(df):
     fig2 = px.pie(df, values='평가 금액', names='섹터', title='섹터별 비중 (평가금액)')
     st.plotly_chart(fig2, use_container_width=True)
 
+def create_bar_chart_by_nation(df):
+    fig3 = px.pie(df, values='평가 금액', names='국가', title='국가별 평가금액')
+    st.plotly_chart(fig3, use_container_width=True)
 
 
 total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA','Dollar'])
 
+
+df_kor = fetch_kor_data()
+df_usa = fetch_usa_data()
+
+today = datetime.date.today()
+yesterday = today - datetime.timedelta(1)
+
+# 어제와 오늘의 USD/KRW 환율을 가져옵니다.
+df_today = fdr.DataReader('USD/KRW', today)
+df_yesterday = fdr.DataReader('USD/KRW', yesterday)
+
+# 오늘의 USD/KRW 환율을 가져옵니다.
+exchange_today = df_today['Close'].iloc[-1]
+exchange_today = round(exchange_today, 2)
+
+# 어제 오늘의 변화량을 기록합니다.
+change = df_today['Close'].iloc[-1] - df_yesterday['Close'].iloc[-1]
+change = round(change, 2)
+if change >= 0:
+    change_diff = str("+") + str(change)+ str("%")
+else:
+    change_diff = str(change)+ str("%")
+change_percent = change / df_yesterday['Close'].iloc[-1] * 100
+
+@st.cache_data()
+def fecth_both_data():
+    #columns = ['종목명','평균 단가','보유 수량','총 투자액','평가 금액','현재 주가','평가 손익','평가 수익률','매수/매도 일자','섹터','비중']
+    df_kor_cpy = df_kor.copy()
+    df_usa_cpy = df_usa.copy()
+    df_usa_cpy['평균 단가'] = df_usa_cpy['평균 단가'] * exchange_today
+    df_usa_cpy['현재 주가'] = df_usa_cpy['현재 주가'] * exchange_today
+    df_usa_cpy['총 투자액'] = df_usa_cpy['총 투자액'] * exchange_today
+    df_usa_cpy['평가 금액'] = df_usa_cpy['평가 금액'] * exchange_today
+    df_usa_cpy['평가 손익'] = df_usa_cpy['평가 손익'] * exchange_today
+
+    del df_usa_cpy['비중']
+    del df_kor_cpy['비중']
+
+    df = pd.concat([df_kor_cpy, df_usa_cpy])
+
+    #전체에서 비중을 새로 계산
+    df['비중'] = df['평가 금액'] / df['평가 금액'].sum() * 100
+    return df
+
+@st.cache_data()
+def fetch_nation_data():
+    df_kor_cpy = df_kor.copy()
+    df_usa_cpy = df_usa.copy()
+    df_usa_cpy['총 투자액'] = df_usa_cpy['총 투자액'] * exchange_today
+    total_usa = int(df_usa_cpy['총 투자액'].sum())
+    total_kor = int(df_kor_cpy['총 투자액'].sum())
+    df = pd.DataFrame({'국가':['한국','미국'],'평가 금액':[total_kor,total_usa]})
+    return df
+
 with total:
+    df = fecth_both_data()
+    both_total = int(df['평가 금액'].sum())
+    kor_total = int(df_kor['평가 금액'].sum())
+    usa_total = int(df_usa['평가 금액'].sum() * exchange_today)
+
+    both_total_diff = int(df['평가 손익'].sum())
+    kor_total_diff = int(df_kor['평가 손익'].sum())
+    usa_total_diff = int(df_usa['평가 손익'].sum()*exchange_today)
+
+    both_total = "{:,}".format(both_total)
+    kor_total = "{:,}".format(kor_total)
+    usa_total = "{:,}".format(usa_total)
+
+    # both_total_diff = "{:,}".format(both_total_diff)
+    # kor_total_diff = "{:,}".format(kor_total_diff)
+    # usa_total_diff = "{:,}".format(usa_total_diff)
+
+    if both_total_diff >= 0:
+        both_total_diff = str("+") + str(both_total_diff) + "원"
+    else:
+        both_total_diff = str(both_total_diff) + "원"
+
+    if kor_total_diff >= 0:
+        kor_total_diff = str("+") + str(kor_total_diff) + "원"
+    else:
+        kor_total_diff = str(kor_total_diff) + "원"
+
+    if usa_total_diff >= 0:
+        usa_total_diff = str("+") + str(usa_total_diff) + "원"
+    else:
+        usa_total_diff = str(usa_total_diff) + "원"
+
+    both_total = str(both_total) + "원"
+    kor_total = str(kor_total) + "원"
+    usa_total = str(usa_total) + "원"
+
     st.title("All Accounts")
+    col1, col2, col3, col4 = st.columns(4)
+    # 비중을 이런걸로 표시해도 UI가 괜찮을듯
+    col1.metric("총 자산(원)", both_total, both_total_diff)
+    col2.metric("한국 주식(원)",kor_total, kor_total_diff)
+    col3.metric("미국 주식(원)", usa_total, usa_total_diff)
+    col4.metric("원/달러 환율",round(exchange_today,2), change_diff)
+
+    create_portfolio_table(df)
+    create_pie_chart_by_stockname(df)
+    create_pie_chart_by_section(df)
+
+    df_nation = fetch_nation_data()
+    create_bar_chart_by_nation(df_nation)
+
 
 with korea:
     st.title("Korea Accounts")
@@ -221,18 +330,16 @@ with korea:
     # 3. 개수나눠서 어떻게 처리하지 매도량 update하기? -> 매도 입력시에 매수 기록의 매도량 update 필요
     # 4. 매도가격 측정은? -> 매도 기록 옆에 매수 가격 컬럼 추가해서 관리 -> 매도 입력시에 추가 처리 필요
     # 5. 그것의 합을 구하면 해당 월의 실현손익일듯.
-    df = fetch_kor_data()
-    create_portfolio_table(df)
-    create_pie_chart_by_stockname(df)
-    create_pie_chart_by_section(df)
+    create_portfolio_table(df_kor)
+    create_pie_chart_by_stockname(df_kor)
+    create_pie_chart_by_section(df_kor)
 
 
 with usa:
     st.title("USA Accounts")
-    df = fetch_usa_data()
-    create_portfolio_table(df)
-    create_pie_chart_by_stockname(df)
-    create_pie_chart_by_section(df)
+    create_portfolio_table(df_usa)
+    create_pie_chart_by_stockname(df_usa)
+    create_pie_chart_by_section(df_usa)
 
 st.write(st.session_state["username"],"님 환영합니다.")
 

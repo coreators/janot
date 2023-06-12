@@ -20,7 +20,7 @@ st.write(userSession + " hello!")
 
 buy_or_sell = st.sidebar.selectbox("매수 매도 선택", ["매수", "매도"])
 
-total, korea, usa, dollar= st.tabs(['Total', 'Korea', 'USA',"Dollar"])
+korea, usa, dollar= st.tabs(['Korea', 'USA',"Dollar"])
 st.sidebar.success("Trading Journal 📝")
 st.sidebar.info("여기는 매매일지 정리 페이지입니다.")
 st.sidebar.title("Trading Journal 📝")
@@ -54,7 +54,7 @@ usa_list = pd.read_csv("resources/usa_ticker_list.csv")
 
 
 # 유저의 모든 데이터를 긁어와서 화면에 표시해주기
-# @st.cache_data()
+@st.cache_data()
 def fetch_data():
     response = requests.get('http://localhost:9000/api/v1/journal/kor/read',
                              json={'email': userSession})
@@ -104,6 +104,7 @@ def fetch_data():
     else:
         return pd.DataFrame()
 
+@st.cache_data()
 def fetch_data_usa():
     response = requests.get('http://localhost:9000/api/v1/journal/usa/read',
                             json={'email': userSession})
@@ -156,55 +157,7 @@ def fetch_data_usa():
 
 def create_table(df):
     st.dataframe(df,use_container_width=True)
-    return
-    gb = GridOptionsBuilder.from_dataframe(df)
 
-    #customize gridOptions
-    #gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
-    #gb.configure_column("date_only", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd', pivot=True)
-    #gb.configure_column("date_tz_aware", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd HH:mm zzz', pivot=True)
-
-    #gb.configure_column("apple", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2, aggFunc='sum')
-    #gb.configure_column("banana", type=["numericColumn", "numberColumnFilter", "customNumericFormat"], precision=1, aggFunc='avg')
-    #gb.configure_column("chocolate", type=["numericColumn", "numberColumnFilter", "customCurrencyFormat"], custom_currency_symbol="R$", aggFunc='max')
-
-
-    cellsytle_jscode = JsCode("""
-    function(params) {
-        if (params.value == 'A') {
-            return {
-                'color': 'white',
-                'backgroundColor': 'darkred'
-            }
-        } else {
-            return {
-                'color': 'black',
-                'backgroundColor': 'white'
-            }
-        }
-    };
-    """)
-    gb.configure_column("group", cellStyle=cellsytle_jscode)
-    gb.configure_side_bar()
-    gb.configure_grid_options(domLayout='normal')
-    gridOptions = gb.build()
-    AgGrid(df,gridOptions=gridOptions,
-           height=1000,
-           width='100%',
-           columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
-           allow_unsafe_jscode=True,
-           enable_enterprise_modules=True)
-
-
-
-with total:
-    st.empty()
-    col1, col2, col3 = st.columns(3)
-    # 비중을 이런걸로 표시해도 UI가 괜찮을듯
-    col1.metric("총 자산", "70 °F", "1.2 °F")
-    col2.metric("한국 주식", "9 mph", "-8%")
-    col3.metric("미국 주식", "86%", "4%")
-    st.title("All Accounts")
 
 with korea:
     st.title("Korea Accounts")
