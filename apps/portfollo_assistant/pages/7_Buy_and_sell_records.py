@@ -51,7 +51,7 @@ def send_buy_journal(ticker, buy_price, buy_amount, buy_date, tax, fee, sector):
     response = requests.post('http://localhost:9000/api/v1/journal/kor/trade',
                              json={'email':st.session_state[usernameSession],
                                  'ticker': ticker, 'price': buy_price, 'amount': buy_amount, 'date': buy_date.isoformat(), 'tax': tax, 'fee': fee,
-                                   'is_buy': True, 'sector': sector})
+                                   'is_buy': True, 'sector': sector,'sold_amount':0,'profit_loss':0})
     return response
 
 def get_buy_record_by_ticker_in_kor(ticker):
