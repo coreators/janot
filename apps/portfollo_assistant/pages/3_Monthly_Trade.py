@@ -221,9 +221,12 @@ df_today = fdr.DataReader('USD/KRW', today)
 df_yesterday = fdr.DataReader('USD/KRW', yesterday)
 
 # 오늘의 USD/KRW 환율을 가져옵니다.
-exchange_today = df_today['Close'].iloc[-1]
+try:
+    exchange_today = df_today['Close'].iloc[-1] # 여기서 버그생김 밤이라 그런가?
+except:
+    exchange_today = df_yesterday['Close'].iloc[-1]
 exchange_today = round(exchange_today, 2)
-change = df_today['Close'].iloc[-1] - df_yesterday['Close'].iloc[-1]
+change = exchange_today - df_yesterday['Close'].iloc[-1]
 change = round(change, 2)
 if change >= 0:
     change_diff = str("+") + str(change)+ str("%")
